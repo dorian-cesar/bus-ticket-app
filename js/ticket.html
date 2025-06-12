@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Venta de Boletos - Buses</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style>
+        .seat {
+            width: 40px;
+            height: 40px;
+            margin: 3px;
+            text-align: center;
+            line-height: 40px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .available {
+            background-color: #e0f7fa;
+        }
+
+        .selected {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .reserved {
+            background-color: #dc3545;
+            color: white;
+            cursor: not-allowed;
+        }
+
+        .empty {
+            background: transparent;
+            border: none;
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+
+    <div class="container my-4">
+        <h2 class="mb-4">Venta de Boletos</h2>
+        <form id="searchForm" class="row g-3 mb-4">
+            <div class="col-md-4">
+                <label for="origin" class="form-label">Ciudad de Origen</label>
+                <input type="text" id="origin" class="form-control" value="Santiago" required>
+            </div>
+            <div class="col-md-4">
+                <label for="destination" class="form-label">Ciudad de Destino</label>
+                <input type="text" id="destination" class="form-control" value="Antofagasta" required>
+            </div>
+            <div class="col-md-4">
+                <label for="date" class="form-label">Fecha del Viaje</label>
+                <input type="date" id="date" class="form-control" required>
+            </div>
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary">Buscar Servicios</button>
+            </div>
+        </form>
+
+        <div class="row">
+            <div class="col-md-6">
+                <h5>Servicios disponibles</h5>
+                <ul id="serviceList" class="list-group"></ul>
+            </div>
+
+            <div class="col-md-6">
+                <h5>Distribución de Asientos</h5>
+                <div id="seatLayout" class="d-flex flex-column gap-2"></div>
+                <button id="confirmBtn" class="btn btn-success mt-3" style="display:none;">Confirmar Selección</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNzQ5MjIzNDYxLCJleHAiOjE3NDkyNTU4NjF9.gLdrZCl7LMp7smbNip5JHjSEn-9-hx0OzKknd6cYSr0';
+        let currentServiceId = '';
+        let selectedSeat = '';
+
+        $('#searchForm').on('submit', function (e) {
+            e.preventDefault();
+            const origin = $('#origin').val();
+            const destination = $('#destination').val();
+            const date = $('#date').val();
+
+            const url = `https://boletos.dev-wit.com/api/services?origin=${origin}&destination=${destination}&date=${date}`;
+            $.get(url, function (data) {
+                $('#serviceList').empty();
+                data.forEach(service => {
+                    $('#serviceList').append(`
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span>
+              <strong>${service.departureTime}</strong> - ${service.company} (${service.busTypeDescription})
+            </span>
+            <button class="btn btn-outline-primary btn-sm selectServiceBtn" data-id="${service.id}">Ver Asientos</button>
+          </li>
+        `);
+                });
+            });
+        });
+
+        $(document).on('click', '.selectServiceBtn', function () {
+            const serviceId = $(this).data('id');
+            currentServiceId = serviceId;
+            selectedSeat = '';
+            $('#seatLayout').empty();
+            $('#confirmBtn').hide();
+
+            // Cargar layout y estados de asientos
+            const layoutUrl = `https://boletos.dev-wit.com/api/services?origin=${$('#origin').val()}&destination=${$('#destination').val()}&date=${$('#date').val()}`;
+            const seatsUrl = `https://boletos.dev-wit.com/api/seats/${serviceId}`;
+
+            // Primero obtenemos el layout
+            $.get(layoutUrl, function (data) {
+                const service = data.find(s => s.id === serviceId);
+                if (!service) return;
+                const layout = service.layout;
+
+                // Luego obtenemos el estado de los asientos
+                $.get(seatsUrl, function (seatStatusList) {
+                    const seatStatusMap = {};
+                    seatStatusList.forEach(seat => {
+                        seatStatusMap[seat.number] = seat;
+                    });
+
+                    const renderSeats = (floorName, seatMap) => {
+                        $('#seatLayout').append(`<h6>${floorName}</h6>`);
+                        seatMap.forEach(row => {
+                            const rowDiv = $('<div class="d-flex"></div>');
+                            row.forEach(seat => {
+                                if (seat === '') {
+                                    rowDiv.append(`<div class="seat empty"></div>`);
+                                } else {
+                                    const seatStatus = seatStatusMap[seat];
+                                    let seatClass = 'available';
+                                    let extraAttr = '';
+
+                                    if (!seatStatus || seatStatus.reserved || seatStatus.paid) {
+                                        seatClass = 'reserved';
+                                        extraAttr = 'style="pointer-events: none;"';
+                                    }
+
+                                    rowDiv.append(`<div class="seat ${seatClass}" data-seat="${seat}" ${extraAttr}>${seat}</div>`);
+                                }
+                            });
+                            $('#seatLayout').append(rowDiv);
+                        });
+                    };
+
+                    
+                    if (layout.floor1) renderSeats('Primer Piso', layout.floor1.seatMap);
+                    if (layout.floor2) renderSeats('Segundo Piso', layout.floor2.seatMap);
+                    if (layout.seatMap) renderSeats('Único Piso', layout.seatMap);
+                });
+            });
+        });
+        $(document).on('click', '.available', function () {
+            $('.seat').removeClass('selected');
+            $(this).addClass('selected');
+            selectedSeat = $(this).data('seat');
+            $('#confirmBtn').show();
+        });
+
+        $('#confirmBtn').on('click', function () {
+            if (!selectedSeat || !currentServiceId) return;
+
+            $.ajax({
+                url: `https://boletos.dev-wit.com/api/seats/${currentServiceId}/reserve`,
+                method: 'POST',
+                headers: {
+                    Authorization: 'Bearer ' + token,
+                    'Content-Type': 'application/json'
+                },
+                data: JSON.stringify({
+                    seatNumber: selectedSeat,
+                    userId: 'usuario123'
+                }),
+                success: function () {
+                    alert(`Asiento ${selectedSeat} reservado con éxito`);
+                    $(`[data-seat="${selectedSeat}"]`).removeClass('available selected').addClass('reserved').off('click');
+                    $('#confirmBtn').hide();
+                    selectedSeat = '';
+                },
+                error: function () {
+                    alert('Error al reservar el asiento');
+                }
+            });
+        });
+    </script>
+
+</body>
+
+</html>
