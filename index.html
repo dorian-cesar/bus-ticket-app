@@ -18,37 +18,58 @@
   <div class="contenedor">
 
     <section class="seccion seccion1">
-      <form id="searchForm" class="formulario">
-        <h3 class="title-form">Seleccione los datos de su viaje</h3>
-        <div class="input-formulario">
-          <div class="form label">
-            <p>Ciudad de Origen</p>
+      <div class="form-container">
+        <form id="searchForm" class="formulario">
+          <div class="form-header">
+            <h3 class="title-form">¡Planifica tu viaje!</h3>
+            <p class="subtitle-form">Selecciona tus datos de viaje</p>
           </div>
-          <select id="origin" class="form select" required></select>
-        </div>
-        <div class="input-formulario">
-          <div class="form label">
-            <p>Ciudad de Destino</p>
+
+          <div class="input-group">
+            <div class="input-formulario">
+              <label for="origin" class="form-label">
+                <i class="fas fa-map-marker-alt"></i> Ciudad de Origen
+              </label>
+              <select id="origin" class="form-select" required>
+                <option value="" disabled selected>Selecciona tu origen</option>
+              </select>
+            </div>
+
+            <div class="input-formulario">
+              <label for="destination" class="form-label">
+                <i class="fas fa-map-marker-alt"></i> Ciudad de Destino
+              </label>
+              <select id="destination" class="form-select" required>
+                <option value="" disabled selected>Selecciona tu destino</option>
+              </select>
+            </div>
+
+            <div class="input-formulario">
+              <label for="date" class="form-label">
+                <i class="fas fa-calendar-alt"></i> Fecha del Viaje
+              </label>
+              <input type="date" id="date" class="form-control" required>
+            </div>
           </div>
-          <select id="destination" class="form select" required></select>
-        </div>
-        <div class="input-formulario">
-          <div class="form label">
-            <p>Fecha del Viaje</p>
+
+          <div class="btn-formulario">
+            <button type="submit" class="btn btn-submit">
+              <i class="fas fa-search"></i> Buscar Servicios
+            </button>
           </div>
-          <input type="date" id="date" class="form control" required>
-        </div>
-        <div class="btn-formulario">
-          <button type="submit" class="btn btn-submit btn-primary">Buscar Servicios</button>
-        </div>
-      </form>
+        </form>
+      </div>
+
       <div class="servicios">
-        <h3>Servicios disponibles</h3>
+        <div class="servicios-header">
+          <h3>Servicios disponibles</h3>
+          <p id="search-results-text" class="results-text"></p>
+        </div>
         <ul id="serviceList" class="list-group"></ul>
       </div>
     </section>
-    
-    
+
+
 
     <section class="seccion seccion2">
       <h3>Distribución de Asientos</h3>
@@ -63,19 +84,27 @@
             <ul class="lista-colores">
               <li class="contenedor-color">
                 <div class="color color-1"></div>
-                <div class="nombre-color"><p>Disponible</p></div>
+                <div class="nombre-color">
+                  <p>Disponible</p>
+                </div>
               </li>
               <li class="contenedor-color">
                 <div class="color color-2"></div>
-                <div class="nombre-color"><p>Seleccionado</p></div>
+                <div class="nombre-color">
+                  <p>Seleccionado</p>
+                </div>
               </li>
               <li class="contenedor-color">
                 <div class="color color-3"></div>
-                <div class="nombre-color"><p>Reservado</p></div>
+                <div class="nombre-color">
+                  <p>Reservado</p>
+                </div>
               </li>
               <li class="contenedor-color">
                 <div class="color color-4"></div>
-                <div class="nombre-color"><p>Bloqueado</p></div>
+                <div class="nombre-color">
+                  <p>Bloqueado</p>
+                </div>
               </li>
             </ul>
           </div>
@@ -99,18 +128,17 @@
 
 
     <!-- Modal de Pago -->
-    <div class="modal" id="paymentModal" tabindex="-1" aria-hidden="true" aria-labelledby="modalTitle" role="dialog"
-      aria-modal="true">
+    <div class="modal" id="paymentModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="modalTitle">Seleccionar Método de Pago</h5>
+            <h5 class="modal-title">Seleccionar Método de Pago</h5>
             <button type="button" class="btn-close" aria-label="Cerrar modal"></button>
           </div>
           <div class="modal-body">
             <button id="payWeb" class="btn btn-primary">Pago Web</button>
             <button id="payCash" class="btn btn-success">Pago en Efectivo</button>
-            <button class="btn btn-secondary">Cancelar</button>
+            <button class="btn btn-secondary btn-close-modal">Cancelar</button>
           </div>
         </div>
       </div>

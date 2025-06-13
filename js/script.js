@@ -1,4 +1,4 @@
-console.log("script cargado")
+console.log("script cargado");
 const token = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNzQ5NzM2OTAyLCJleHAiOjE3NDk3NjkzMDJ9.PrzUqNwoZAMLS5mC-PNWTwyhZJevkhh5Vp7bWSoB4rU';
 
 let currentServiceId = '';
@@ -6,6 +6,8 @@ let selectedSeats = [];
 let currentServiceData = null;
 
 $(document).ready(function () {
+    $('.seccion1').addClass('active');
+    
     $.get('https://boletos.dev-wit.com/api/routes/origins', function (data) {
         $('#origin').append('<option disabled selected>Seleccione</option>');
         data.forEach(route => {
@@ -29,26 +31,38 @@ $('#searchForm').on('submit', function (e) {
     const destination = $('#destination').val();
     const date = $('#date').val();
 
+    $('#serviceList').empty().append(`
+        <li class="list-group-item loading" style="height: 100px;"></li>
+        <li class="list-group-item loading" style="height: 100px;"></li>
+    `);
+
     $.get(`https://boletos.dev-wit.com/api/services?origin=${origin}&destination=${destination}&date=${date}`, function (data) {
         $('#serviceList').empty();
+        if (data.length === 0) {
+            $('#serviceList').append('<li class="list-group-item">No hay servicios disponibles</li>');
+            return;
+        }
+        
         data.forEach(service => {
             $('#serviceList').append(`
-          <li class="list-group-item">
-          <div class="contenido-item">
-          <div class="contenido-servicio">
-          <span>
-            <strong>${service.departureTime}</strong> - ${service.company}  (${service.busTypeDescription}) <div>Piso 1 ${service.seatDescriptionFirst}-$${service.priceFirst}</div>
-            <div>Piso 2 ${service.seatDescriptionSecond}-$${service.priceSecond}</div>
-            </span>
-          </div>
-            <div class="button-servicio">
-            <button class="btn selectServiceBtn btn-primary" data-id="${service.id}">Ver Asientos</button>
-            </div>
-          </div>
-          
-          </li>
-        `);
+                <li class="list-group-item">
+                    <div class="contenido-item">
+                        <div class="contenido-servicio">
+                            <span>
+                                <strong>${service.departureTime}</strong> - ${service.company} (${service.busTypeDescription}) 
+                                <div>Piso 1 ${service.seatDescriptionFirst}-$${service.priceFirst}</div>
+                                <div>Piso 2 ${service.seatDescriptionSecond}-$${service.priceSecond}</div>
+                            </span>
+                        </div>
+                        <div class="button-servicio">
+                            <button class="btn selectServiceBtn btn-primary" data-id="${service.id}">Ver Asientos</button>
+                        </div>
+                    </div>
+                </li>
+            `);
         });
+    }).fail(() => {
+        $('#serviceList').empty().append('<li class="list-group-item">Error al cargar servicios</li>');
     });
 });
 
@@ -56,14 +70,18 @@ $(document).on('click', '.selectServiceBtn', function () {
     const serviceId = $(this).data('id');
     currentServiceId = serviceId;
     selectedSeats = [];
-    $('#seatLayout').empty();
-    $('#ticketDetails').empty();
+    $('#seatLayout').empty().append(`
+        <div class="loading" style="height: 300px; width: 100%;"></div>
+    `);
+    $('#ticketDetails').empty().hide();
+    $('.seccion2').addClass('active');
 
     $.get(`https://boletos.dev-wit.com/api/services?origin=${$('#origin').val()}&destination=${$('#destination').val()}&date=${$('#date').val()}`, function (data) {
         currentServiceData = data.find(s => s.id === serviceId);
         const layout = currentServiceData.layout;
 
         $.get(`https://boletos.dev-wit.com/api/seats/${serviceId}`, function (seatStatusData) {
+            $('#seatLayout').empty();
             const seatStatusMap = {};
             seatStatusData.forEach(seat => {
                 seatStatusMap[seat.number] = seat;
@@ -89,7 +107,11 @@ $(document).on('click', '.selectServiceBtn', function () {
             if (layout.floor1) renderSeats('Primer Piso', layout.floor1.seatMap, 1);
             if (layout.floor2) renderSeats('Segundo Piso', layout.floor2.seatMap, 2);
             if (layout.seatMap) renderSeats('Único Piso', layout.seatMap, 1);
+        }).fail(() => {
+            $('#seatLayout').empty().append('<div class="error">Error al cargar asientos</div>');
         });
+    }).fail(() => {
+        $('#seatLayout').empty().append('<div class="error">Error al cargar servicio</div>');
     });
 });
 
@@ -115,6 +137,9 @@ $(document).on('click', '.seat.available, .seat.selected', function () {
                 $(this).removeClass('selected').addClass('available');
                 selectedSeats.splice(index, 1);
                 updateTicketDetails();
+            },
+            error: () => {
+                alert('Error al liberar el asiento');
             }
         });
     } else {
@@ -132,31 +157,73 @@ $(document).on('click', '.seat.available, .seat.selected', function () {
                 const price = floor === 1 ? currentServiceData.priceFirst : currentServiceData.priceSecond;
                 selectedSeats.push({ seat, floor, price });
                 updateTicketDetails();
+            },
+            error: () => {
+                alert('Error al reservar el asiento');
             }
         });
     }
 });
 
 function updateTicketDetails() {
+    const $ticketDetails = $('#ticketDetails');
+    
     if (selectedSeats.length === 0) {
-        $('#ticketDetails').empty();
+        $ticketDetails.empty().hide();
         return;
     }
 
-    let html = '</ul><button class="btn btn-border" data-bs-toggle="modal" data-bs-target="#paymentModal">Pagar</button>';
+    $ticketDetails.show();
+    
+    let html = '<ul class="lista-asientos">';
     selectedSeats.forEach(s => {
         html += `<li class="lista-asientos-item">Asiento ${s.seat} (Piso ${s.floor}) - $${s.price}</li>`;
     });
+    html += '</ul><button class="btn btn-primary" id="openPaymentModal">Pagar</button>';
     
-
-    $('#ticketDetails').html(html);
+    $ticketDetails.html(html).hide().fadeIn(300);
 }
 
+// Mostrar modal con animación
+$(document).on('click', '#openPaymentModal', function() {
+    $('#paymentModal').fadeIn(300).addClass('show');
+    document.body.style.overflow = 'hidden';
+});
+
+// Función para ocultar modal
+function hideModal() {
+    $('#paymentModal').fadeOut(300, function() {
+        $(this).removeClass('show');
+        document.body.style.overflow = '';
+    });
+}
+
+// Cerrar modal al hacer clic en los botones de cerrar
+$(document).on('click', '.btn-close, .btn-close-modal', hideModal);
+
+// Cerrar modal al hacer clic fuera del contenido
+$('#paymentModal').on('click', function(e) {
+    if (e.target === this) hideModal();
+});
+
+// Cerrar modal con tecla ESC
+$(document).on('keydown', function(e) {
+    if (e.key === 'Escape' && $('#paymentModal').hasClass('show')) {
+        hideModal();
+    }
+});
+
+// Manejo de pagos
 $('#payWeb, #payCash').on('click', function () {
     const method = this.id === 'payWeb' ? 'web' : 'cash';
     const authCode = method === 'web' ? 'AUTHWEB123' : 'AUTHCASH123';
+    const $modal = $('#paymentModal');
+
+    // Mostrar estado de carga
+    $modal.find('.modal-body').html('<div class="loading-payment">Procesando pago...</div>');
 
     // Simular pago y confirmar asientos
+    let processed = 0;
     selectedSeats.forEach(s => {
         $.ajax({
             url: `https://boletos.dev-wit.com/api/seats/${currentServiceId}/confirm`,
@@ -172,60 +239,32 @@ $('#payWeb, #payCash').on('click', function () {
             }),
             success: () => {
                 $(`[data-seat="${s.seat}"]`).removeClass('selected').addClass('reserved').off('click');
+                processed++;
+                
+                if (processed === selectedSeats.length) {
+                    $modal.find('.modal-body').html(`
+                        <div class="payment-success">
+                            <h4>¡Pago exitoso!</h4>
+                            <p>Los asientos han sido reservados correctamente.</p>
+                            <button class="btn btn-primary btn-close-modal">Aceptar</button>
+                        </div>
+                    `);
+                    selectedSeats = [];
+                    $('#ticketDetails').empty().hide();
+                }
+            },
+            error: () => {
+                processed++;
+                if (processed === selectedSeats.length) {
+                    $modal.find('.modal-body').html(`
+                        <div class="payment-error">
+                            <h4>Error en el pago</h4>
+                            <p>Algunos asientos no pudieron ser reservados.</p>
+                            <button class="btn btn-primary btn-close-modal">Aceptar</button>
+                        </div>
+                    `);
+                }
             }
         });
-    });
-
-    selectedSeats = [];
-    $('#ticketDetails').empty();
-    const modal = bootstrap.Modal.getInstance(document.getElementById('paymentModal'));
-    modal.hide();
-});
-
-
-document.addEventListener('DOMContentLoaded', function () {
-    const modal = document.getElementById('paymentModal');
-    const openModalBtn = document.querySelector('#ticketDetails button.btn-warning');
-    const closeButtons = modal.querySelectorAll('.btn-close, .btn-secondary');
-
-    // Función para mostrar modal
-    function showModal() {
-        modal.classList.add('show');
-        modal.setAttribute('aria-hidden', 'false');
-        // Opcional: bloquear scroll de fondo
-        document.body.style.overflow = 'hidden';
-    }
-
-    // Función para ocultar modal
-    function hideModal() {
-        modal.classList.remove('show');
-        modal.setAttribute('aria-hidden', 'true');
-        document.body.style.overflow = '';
-    }
-
-    // Abrir modal al click en botón de pagar
-    document.body.addEventListener('click', function (e) {
-        if (e.target.matches('#ticketDetails button.btn-warning')) {
-            showModal();
-        }
-    });
-
-    // Cerrar modal al click en botones de cerrar o cancelar
-    closeButtons.forEach(btn => {
-        btn.addEventListener('click', hideModal);
-    });
-
-    // Cerrar modal si se hace click fuera del contenido del modal (overlay)
-    modal.addEventListener('click', function (e) {
-        if (e.target === modal) {
-            hideModal();
-        }
-    });
-
-    // Opcional: cerrar modal con tecla ESC
-    document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape' && modal.classList.contains('show')) {
-            hideModal();
-        }
     });
 });
