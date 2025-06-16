@@ -1,5 +1,5 @@
 console.log("script cargado");
-const token = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNzQ5NzM2OTAyLCJleHAiOjE3NDk3NjkzMDJ9.PrzUqNwoZAMLS5mC-PNWTwyhZJevkhh5Vp7bWSoB4rU';
+const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNzUwMDgxNDIyLCJleHAiOjE3NTAxMTM4MjJ9._-T2Tw2E7tWb23g_gIcLWlAFPSoKTBe9QAvQv66M9lA';
 
 let currentServiceId = '';
 let selectedSeats = [];
@@ -7,7 +7,7 @@ let currentServiceData = null;
 
 $(document).ready(function () {
     $('.seccion1').addClass('active');
-    
+
     $.get('https://boletos.dev-wit.com/api/routes/origins', function (data) {
         $('#origin').append('<option disabled selected>Seleccione</option>');
         data.forEach(route => {
@@ -42,7 +42,7 @@ $('#searchForm').on('submit', function (e) {
             $('#serviceList').append('<li class="list-group-item">No hay servicios disponibles</li>');
             return;
         }
-        
+
         data.forEach(service => {
             $('#serviceList').append(`
                 <li class="list-group-item">
@@ -70,6 +70,8 @@ $(document).on('click', '.selectServiceBtn', function () {
     const serviceId = $(this).data('id');
     currentServiceId = serviceId;
     selectedSeats = [];
+
+    $('.contenido-seccion').removeClass('active');
     $('#seatLayout').empty().append(`
         <div class="loading" style="height: 300px; width: 100%;"></div>
     `);
@@ -107,11 +109,14 @@ $(document).on('click', '.selectServiceBtn', function () {
             if (layout.floor1) renderSeats('Primer Piso', layout.floor1.seatMap, 1);
             if (layout.floor2) renderSeats('Segundo Piso', layout.floor2.seatMap, 2);
             if (layout.seatMap) renderSeats('Único Piso', layout.seatMap, 1);
+            $('.contenido-seccion').addClass('active');
         }).fail(() => {
             $('#seatLayout').empty().append('<div class="error">Error al cargar asientos</div>');
+            $('.contenido-seccion').addClass('active');
         });
     }).fail(() => {
         $('#seatLayout').empty().append('<div class="error">Error al cargar servicio</div>');
+        $('.contenido-seccion').addClass('active');
     });
 });
 
@@ -167,32 +172,32 @@ $(document).on('click', '.seat.available, .seat.selected', function () {
 
 function updateTicketDetails() {
     const $ticketDetails = $('#ticketDetails');
-    
+
     if (selectedSeats.length === 0) {
         $ticketDetails.empty().hide();
         return;
     }
 
     $ticketDetails.show();
-    
+
     let html = '<ul class="lista-asientos">';
     selectedSeats.forEach(s => {
         html += `<li class="lista-asientos-item">Asiento ${s.seat} (Piso ${s.floor}) - $${s.price}</li>`;
     });
-    html += '</ul><button class="btn btn-primary" id="openPaymentModal">Pagar</button>';
-    
+    html += '</ul><button class="btn btn-primary btn-pagar" id="openPaymentModal">Pagar</button>';
+
     $ticketDetails.html(html).hide().fadeIn(300);
 }
 
 // Mostrar modal con animación
-$(document).on('click', '#openPaymentModal', function() {
+$(document).on('click', '#openPaymentModal', function () {
     $('#paymentModal').fadeIn(300).addClass('show');
     document.body.style.overflow = 'hidden';
 });
 
 // Función para ocultar modal
 function hideModal() {
-    $('#paymentModal').fadeOut(300, function() {
+    $('#paymentModal').fadeOut(300, function () {
         $(this).removeClass('show');
         document.body.style.overflow = '';
     });
@@ -202,22 +207,38 @@ function hideModal() {
 $(document).on('click', '.btn-close, .btn-close-modal', hideModal);
 
 // Cerrar modal al hacer clic fuera del contenido
-$('#paymentModal').on('click', function(e) {
+$('#paymentModal').on('click', function (e) {
     if (e.target === this) hideModal();
 });
 
 // Cerrar modal con tecla ESC
-$(document).on('keydown', function(e) {
+$(document).on('keydown', function (e) {
     if (e.key === 'Escape' && $('#paymentModal').hasClass('show')) {
         hideModal();
     }
 });
 
-// Manejo de pagos
-$('#payWeb, #payCash').on('click', function () {
+
+// Función para inicializar los eventos de pago
+function initPaymentButtons() {
+    $(document).off('click', '#payWeb, #payCash').on('click', '#payWeb, #payCash', handlePayment);
+}
+
+// Función principal de manejo de pagos
+function handlePayment() {
     const method = this.id === 'payWeb' ? 'web' : 'cash';
     const authCode = method === 'web' ? 'AUTHWEB123' : 'AUTHCASH123';
     const $modal = $('#paymentModal');
+
+    const originalModalContent = `
+        <div class="modal-body">
+            
+            <button id="payWeb" class="btn btn-primary">Pago Web</button>
+            <button id="payCash" class="btn btn-success">Pago en Efectivo</button>
+            
+            <button class="btn btn-secondary btn-close-modal">Cancelar</button>
+        </div>
+    `;
 
     // Mostrar estado de carga
     $modal.find('.modal-body').html('<div class="loading-payment">Procesando pago...</div>');
@@ -242,29 +263,38 @@ $('#payWeb, #payCash').on('click', function () {
                 processed++;
                 
                 if (processed === selectedSeats.length) {
-                    $modal.find('.modal-body').html(`
-                        <div class="payment-success">
-                            <h4>¡Pago exitoso!</h4>
-                            <p>Los asientos han sido reservados correctamente.</p>
-                            <button class="btn btn-primary btn-close-modal">Aceptar</button>
-                        </div>
-                    `);
-                    selectedSeats = [];
-                    $('#ticketDetails').empty().hide();
+                    showPaymentResult($modal, originalModalContent, true);
                 }
             },
             error: () => {
                 processed++;
                 if (processed === selectedSeats.length) {
-                    $modal.find('.modal-body').html(`
-                        <div class="payment-error">
-                            <h4>Error en el pago</h4>
-                            <p>Algunos asientos no pudieron ser reservados.</p>
-                            <button class="btn btn-primary btn-close-modal">Aceptar</button>
-                        </div>
-                    `);
+                    showPaymentResult($modal, originalModalContent, false);
                 }
             }
         });
     });
-});
+}
+
+// Función para mostrar el resultado del pago
+function showPaymentResult($modal, originalContent, isSuccess) {
+    $modal.find('.modal-body').html(`
+        <div class="payment-${isSuccess ? 'success' : 'error'}">
+            <h4>${isSuccess ? '¡Pago exitoso!' : 'Error en el pago'}</h4>
+            <p>${isSuccess ? 'Los asientos han sido reservados correctamente.' : 'Algunos asientos no pudieron ser reservados.'}</p>
+            <button class="btn btn-primary btn-restore-payment-options btn-close-modal">Aceptar</button>
+        </div>
+    `);
+    
+    selectedSeats = [];
+    $('#ticketDetails').empty().hide();
+    
+    // Configurar el botón para restaurar el contenido
+    $(document).off('click', '.btn-restore-payment-options').on('click', '.btn-restore-payment-options', function() {
+        $modal.find('.modal-body').html(originalContent);
+        initPaymentButtons(); // Re-inicializar los botones de pago
+    });
+}
+
+// Inicializar los botones de pago al cargar la página
+initPaymentButtons();

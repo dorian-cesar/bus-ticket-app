@@ -252,11 +252,23 @@ input[type="date"].form-control {
   margin-top: 250px;
   color: white;
 }
-.contenido-seccion{
+
+.contenido-seccion {
   margin-top: 50px;
-  display: flex;
+  display: none;
+  opacity: 0;
+  transform: translateY(-20px); /* Empieza 20px más arriba */
+  transition: 
+    opacity 0.4s ease-out,
+    transform 0.4s ease-out;
   width: 100%;
   gap: 20px;
+}
+
+.contenido-seccion.active {
+  display: flex;
+  opacity: 1;
+  transform: translateY(0); /* Vuelve a su posición natural */
 }
 
 .distribucion{
@@ -432,6 +444,7 @@ input[type="date"].form-control {
 .modal-body {
   padding: 1rem;
   text-align: center;
+  display: flex;
 }
 
 
@@ -478,6 +491,13 @@ input[type="date"].form-control {
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
+.btn-pagar{
+  margin-top: 10px;
+}
+
+.contenedor-botones{
+  margin-bottom: 10px;
+}
 /* Animación para las secciones */
 .seccion {
   opacity: 0;
