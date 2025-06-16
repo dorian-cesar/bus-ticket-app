@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="css/asientos.css">
+  <link rel="stylesheet" href="css/secciones.css">
   <title>Venta de Boletos - Buses</title>
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
@@ -120,7 +121,86 @@
 
 
     <section class="seccion seccion3">
+      <div class="resumen">
+        <h2>Resumen de tu viaje</h2>
+    
+        <!-- Sección de Recorrido -->
+        <div class="action-buttons">
+        </div><button class="btn btn-primary btn-pagar" id="openPaymentModal">Pagar</button>
+        
+        <div class="info-section price-section">
+          <div class="price-detail">
+            <span class="label">Total a pagar:</span>
+            <span id="total-price" class="price">$0</span>
+          </div>
+        </div>
+        <div class="info-section">
+          <h3 class="section-title">Recorrido</h3>
+          <div class="route-info">
+            <div class="location">
+              <span class="label">Desde</span>
+              <span id="origen" class="city"></span>
+            </div>
+            <div class="route-arrow">→</div>
+            <div class="location">
+              <span class="label">Hacia</span>
+              <span id="destino" class="city"></span>
+            </div>
+          </div>
+        </div>
+    
+        <!-- Sección de Horario -->
+        <div class="info-section">
+          <h3 class="section-title">Horario</h3>
+          <div class="date-info">
+            <span id="fecha" class="travel-date"></span>
+          </div>
+          <div class="time-info">
+            <div class="time-group">
+              <span class="label">Salida</span>
+              <span id="hora-ida" class="time">08:00 hrs</span>
+            </div>
+            <div class="time-arrow">→</div>
+            <div class="time-group">
+              <span class="label">Llegada aprox.</span>
+              <span id="hora-llegada" class="time">10:30 hrs</span>
+            </div>
+          </div>
+        </div>
+    
+        <!-- Sección de Asientos -->
+        <div class="info-section">
+          <h3 class="section-title">Asientos seleccionados</h3>
+          <div id="selected-seats" class="seats-container">
+            <!-- Aquí se insertarán dinámicamente los asientos seleccionados -->
+            <span class="seat-number">A1</span>
+            <span class="seat-number">B3</span>
+          </div>
+        </div>
+    
+        <!-- Sección del Bus -->
+        <div class="info-section">
+          <h3 class="section-title">Información del Bus</h3>
+          <div class="bus-info">
+            <div class="bus-detail">
+              <span class="label">Patente:</span>
+              <span id="bus-plate" class="detail">AB1234</span>
+            </div>
+            <div class="bus-detail">
+              <span class="label">Tipo:</span>
+              <span id="bus-type" class="detail">Semi Cama</span>
+            </div>
+            <div class="bus-detail">
+              <span class="label">Empresa:</span>
+              <span id="bus-company" class="detail">Tur Bus</span>
+            </div>
+          </div>
+        </div>
+    
+        <!-- Sección de Precio -->
 
+    
+      </div>
     </section>
 
 

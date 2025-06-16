@@ -31,6 +31,12 @@ $('#searchForm').on('submit', function (e) {
     const destination = $('#destination').val();
     const date = $('#date').val();
 
+    const originText = $('#origin option:selected').text();
+    const destinationText = $('#destination option:selected').text();
+    const formattedDate = date;
+
+    updateTravelSummary(originText, destinationText, formattedDate);
+
     $('#serviceList').empty().append(`
         <li class="list-group-item loading" style="height: 100px;"></li>
         <li class="list-group-item loading" style="height: 100px;"></li>
@@ -48,10 +54,16 @@ $('#searchForm').on('submit', function (e) {
                 <li class="list-group-item">
                     <div class="contenido-item">
                         <div class="contenido-servicio">
+                            <div class="header-servicio">
+                            ${service.availableSeats} Asientos Disponibles <br>
+                            <strong>${service.departureTime}</strong> - <strong>${service.arrivalTime}</strong> 
+                            </div>
+                        
                             <span>
-                                <strong>${service.departureTime}</strong> - ${service.company} (${service.busTypeDescription}) 
-                                <div>Piso 1 ${service.seatDescriptionFirst}-$${service.priceFirst}</div>
-                                <div>Piso 2 ${service.seatDescriptionSecond}-$${service.priceSecond}</div>
+                                
+                                ${service.company} (${service.busTypeDescription})
+                                <div>Piso 1 ${service.seatDescriptionFirst}- <strong>$${service.priceFirst}</strong></div>
+                                <div>Piso 2 ${service.seatDescriptionSecond}- <strong>$${service.priceSecond}</strong></div>
                             </span>
                         </div>
                         <div class="button-servicio">
@@ -65,6 +77,16 @@ $('#searchForm').on('submit', function (e) {
         $('#serviceList').empty().append('<li class="list-group-item">Error al cargar servicios</li>');
     });
 });
+
+
+function updateTravelSummary(origin, destination, date) {
+    $('#origen').text(origin);
+    $('#destino').text(destination);
+    $('#fecha').text(date);
+    
+
+    $('.seccion3').addClass('active');
+}
 
 $(document).on('click', '.selectServiceBtn', function () {
     const serviceId = $(this).data('id');
@@ -184,7 +206,7 @@ function updateTicketDetails() {
     selectedSeats.forEach(s => {
         html += `<li class="lista-asientos-item">Asiento ${s.seat} (Piso ${s.floor}) - $${s.price}</li>`;
     });
-    html += '</ul><button class="btn btn-primary btn-pagar" id="openPaymentModal">Pagar</button>';
+    html += '</ul><button class="btn btn-primary btn-confirmar">Confirmar</button>';
 
     $ticketDetails.html(html).hide().fadeIn(300);
 }
@@ -235,7 +257,6 @@ function handlePayment() {
             
             <button id="payWeb" class="btn btn-primary">Pago Web</button>
             <button id="payCash" class="btn btn-success">Pago en Efectivo</button>
-            
             <button class="btn btn-secondary btn-close-modal">Cancelar</button>
         </div>
     `;
