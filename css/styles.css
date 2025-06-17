@@ -186,7 +186,7 @@ input[type="date"].form-control {
   margin: 10px 0;
   border-radius: 15px;
   display: flex;
-  height: 100px;
+  min-height: 100px;
 }
 
 .contenido-item{
@@ -199,7 +199,23 @@ input[type="date"].form-control {
 
 .contenido-servicio{
   display: flex;
-  padding-left: 15px;
+  flex-direction: column;
+}
+.header-servicio{
+  font-weight: bold;
+  font-size: 1rem;
+  padding: 5px 10px 0 20px;
+  width: 100%;
+}
+.info-servicio{
+  display: flex;
+  font-size: 0.9rem;
+  padding: 10px;
+}
+
+.info1{
+  width: 25%;
+  padding-left: 10px;
 }
 
 .button-servicio{
@@ -213,7 +229,6 @@ input[type="date"].form-control {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
 }
 
 .servicios h3 {
@@ -591,6 +606,7 @@ input[type="date"].form-control {
 .btn-pagar{
   width: 100%;
   margin-bottom: 25px;
+  font-size: 1.3rem;
 }
 
 
@@ -704,7 +720,6 @@ input[type="date"].form-control {
   border-radius: 50px;
   border: none;
   font-weight: bold;
-  font-size: 1.2rem;
   cursor: pointer;
 }
 
@@ -727,7 +742,9 @@ input[type="date"].form-control {
 .btn-confirmar{
   margin-top: 10px;
 }
-
+.selectServiceBtn{
+  font-size: 0.9rem;
+}
 .contenedor-botones{
   margin-bottom: 10px;
 }

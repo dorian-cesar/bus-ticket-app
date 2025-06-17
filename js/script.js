@@ -1,5 +1,18 @@
+
+
 console.log("script cargado");
-const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNzUwMDgxNDIyLCJleHAiOjE3NTAxMTM4MjJ9._-T2Tw2E7tWb23g_gIcLWlAFPSoKTBe9QAvQv66M9lA';
+
+async function obtenertoken() {
+    try {
+        const res = await fetch('http://localhost:3000/api/token');
+        if (!res.ok) throw new Error('Error al obtener token');
+
+        const data = await res.json();
+        return data.token;
+    } catch (error) {
+        return null;
+    }
+}
 
 let currentServiceId = '';
 let selectedSeats = [];
@@ -35,7 +48,7 @@ $('#searchForm').on('submit', function (e) {
     const destinationText = $('#destination option:selected').text();
     const formattedDate = date;
 
-    updateTravelSummary(originText, destinationText, formattedDate);
+    updateTravelSummary(originText, destinationText, formattedDate, null, null);
 
     $('#serviceList').empty().append(`
         <li class="list-group-item loading" style="height: 100px;"></li>
@@ -45,7 +58,7 @@ $('#searchForm').on('submit', function (e) {
     $.get(`https://boletos.dev-wit.com/api/services?origin=${origin}&destination=${destination}&date=${date}`, function (data) {
         $('#serviceList').empty();
         if (data.length === 0) {
-            $('#serviceList').append('<li class="list-group-item">No hay servicios disponibles</li>');
+            $('#serviceList').append('<li class="list-group-item"><div class="info-servicio">No hay servicios disponibles</div></li>');
             return;
         }
 
@@ -55,16 +68,19 @@ $('#searchForm').on('submit', function (e) {
                     <div class="contenido-item">
                         <div class="contenido-servicio">
                             <div class="header-servicio">
-                            ${service.availableSeats} Asientos Disponibles <br>
-                            <strong>${service.departureTime}</strong> - <strong>${service.arrivalTime}</strong> 
+                            ${service.company} (${service.busTypeDescription}) <strong>${service.departureTime}</strong> - <strong>${service.arrivalTime}</strong> 
+
                             </div>
-                        
-                            <span>
-                                
-                                ${service.company} (${service.busTypeDescription})
-                                <div>Piso 1 ${service.seatDescriptionFirst}- <strong>$${service.priceFirst}</strong></div>
-                                <div>Piso 2 ${service.seatDescriptionSecond}- <strong>$${service.priceSecond}</strong></div>
-                            </span>
+                            <div class="info-servicio">
+                                    <div class="info1">
+                                    <strong>${service.availableSeats}</strong> Asientos Disponibles
+                                    
+                                </div>
+                                <div class="info2">
+                                    <div><strong>Piso 1: </strong><br>${service.seatDescriptionFirst} - <strong>$${service.priceFirst}</strong></div>
+                                    <div><strong>Piso 2: </strong><br>${service.seatDescriptionSecond} - <strong>$${service.priceSecond}</strong></div>
+                                </div>
+                            </div>
                         </div>
                         <div class="button-servicio">
                             <button class="btn selectServiceBtn btn-primary" data-id="${service.id}">Ver Asientos</button>
@@ -79,19 +95,15 @@ $('#searchForm').on('submit', function (e) {
 });
 
 
-function updateTravelSummary(origin, destination, date) {
-    $('#origen').text(origin);
-    $('#destino').text(destination);
-    $('#fecha').text(date);
-    
 
-    $('.seccion3').addClass('active');
-}
 
 $(document).on('click', '.selectServiceBtn', function () {
     const serviceId = $(this).data('id');
     currentServiceId = serviceId;
     selectedSeats = [];
+
+    $('#selected-seats').empty();
+    $('#total-price').text('$0');
 
     $('.contenido-seccion').removeClass('active');
     $('#seatLayout').empty().append(`
@@ -102,6 +114,15 @@ $(document).on('click', '.selectServiceBtn', function () {
 
     $.get(`https://boletos.dev-wit.com/api/services?origin=${$('#origin').val()}&destination=${$('#destination').val()}&date=${$('#date').val()}`, function (data) {
         currentServiceData = data.find(s => s.id === serviceId);
+
+        updateTravelSummary(
+            $('#origin option:selected').text(),
+            $('#destination option:selected').text(),
+            $('#date').val(),
+            currentServiceData.departureTime,
+            currentServiceData.arrivalTime
+        );
+
         const layout = currentServiceData.layout;
 
         $.get(`https://boletos.dev-wit.com/api/seats/${serviceId}`, function (seatStatusData) {
@@ -142,8 +163,36 @@ $(document).on('click', '.selectServiceBtn', function () {
     });
 });
 
-$(document).on('click', '.seat.available, .seat.selected', function () {
-    const seat = $(this).data('seat');
+function updateTravelSummary(origin, destination, date, departureTime, arrivalTime) {
+    $('#origen').text(origin);
+    $('#destino').text(destination);
+    $('#fecha').text(date);
+    $('#hora-ida').text(departureTime || '--:--');
+    $('#hora-llegada').text(arrivalTime || '--:--');
+
+    // También actualiza otros datos del bus si es necesario
+    if (currentServiceData) {
+        $('#bus-plate').text('No disponible');
+        $('#bus-type').text(currentServiceData.busTypeDescription || 'No disponible');
+        $('#bus-company').text(currentServiceData.company || 'No disponible');
+
+        // Calcular y mostrar el precio total
+        const total = selectedSeats.reduce((sum, seat) => sum + seat.price, 0);
+        $('#total-price').text('$' + total);
+    }
+
+    $('.seccion3').addClass('active');
+}
+
+$(document).on('click', '.seat.available, .seat.selected', async function () {
+    const token = await obtenertoken();
+
+    if (!token) {
+        alert('No se pudo obtener reservar el asiento, intente en unos minutos');
+        return;
+    }
+
+    const seat = String($(this).data('seat')); 
     const floor = $(this).data('floor');
     const index = selectedSeats.findIndex(s => s.seat === seat);
 
@@ -153,12 +202,12 @@ $(document).on('click', '.seat.available, .seat.selected', function () {
             url: 'https://boletos.dev-wit.com/api/services/revert-seat',
             method: 'PATCH',
             headers: {
-                Authorization: token,
+                Authorization: `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
             data: JSON.stringify({
                 serviceId: currentServiceId,
-                seatNumber: seat
+                seatNumber: String(seat)
             }),
             success: () => {
                 $(this).removeClass('selected').addClass('available');
@@ -175,10 +224,10 @@ $(document).on('click', '.seat.available, .seat.selected', function () {
             url: `https://boletos.dev-wit.com/api/seats/${currentServiceId}/reserve`,
             method: 'POST',
             headers: {
-                Authorization: token,
+                Authorization: `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
-            data: JSON.stringify({ seatNumber: seat, userId: 'usuario123' }),
+            data: JSON.stringify({ seatNumber: String(seat), userId: 'usuario123' }),
             success: () => {
                 $(this).removeClass('available').addClass('selected');
                 const price = floor === 1 ? currentServiceData.priceFirst : currentServiceData.priceSecond;
@@ -186,7 +235,11 @@ $(document).on('click', '.seat.available, .seat.selected', function () {
                 updateTicketDetails();
             },
             error: () => {
-                alert('Error al reservar el asiento');
+                alert('El asiento ha sido ocupado');
+                const $serviceBtn = $(`.selectServiceBtn[data-id="${currentServiceId}"]`);
+                if ($serviceBtn.length) {
+                    $serviceBtn.trigger('click'); 
+                }
             }
         });
     }
@@ -197,6 +250,9 @@ function updateTicketDetails() {
 
     if (selectedSeats.length === 0) {
         $ticketDetails.empty().hide();
+        $('#total-price').text('$0');
+        $('#selected-seats').empty();
+        
         return;
     }
 
@@ -204,12 +260,21 @@ function updateTicketDetails() {
 
     let html = '<ul class="lista-asientos">';
     selectedSeats.forEach(s => {
-        html += `<li class="lista-asientos-item">Asiento ${s.seat} (Piso ${s.floor}) - $${s.price}</li>`;
+        html += `<li class="lista-asientos-item">Asiento ${s.seat} (Piso ${s.floor}) <br> $${s.price}</li>`;
     });
-    html += '</ul><button class="btn btn-primary btn-confirmar">Confirmar</button>';
+    html += '</ul>';
 
     $ticketDetails.html(html).hide().fadeIn(300);
+
+    const total = selectedSeats.reduce((sum, seat) => sum + seat.price, 0);
+    $('#total-price').text('$' + total);
+
+    $('#selected-seats').empty();
+    selectedSeats.forEach(seat => {
+        $('#selected-seats').append(`<span class="seat-number">${seat.seat}</span>`);
+    });
 }
+
 
 // Mostrar modal con animación
 $(document).on('click', '#openPaymentModal', function () {
@@ -247,7 +312,14 @@ function initPaymentButtons() {
 }
 
 // Función principal de manejo de pagos
-function handlePayment() {
+async function handlePayment() {
+    const token = await obtenertoken();
+
+    if (!token) {
+        alert('No se pudo procesar el pago, intente en unos minutos');
+        return;
+    }
+
     const method = this.id === 'payWeb' ? 'web' : 'cash';
     const authCode = method === 'web' ? 'AUTHWEB123' : 'AUTHCASH123';
     const $modal = $('#paymentModal');
@@ -271,7 +343,7 @@ function handlePayment() {
             url: `https://boletos.dev-wit.com/api/seats/${currentServiceId}/confirm`,
             method: 'POST',
             headers: {
-                Authorization: token,
+                Authorization: `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
             data: JSON.stringify({
@@ -282,7 +354,7 @@ function handlePayment() {
             success: () => {
                 $(`[data-seat="${s.seat}"]`).removeClass('selected').addClass('reserved').off('click');
                 processed++;
-                
+
                 if (processed === selectedSeats.length) {
                     showPaymentResult($modal, originalModalContent, true);
                 }
@@ -306,16 +378,40 @@ function showPaymentResult($modal, originalContent, isSuccess) {
             <button class="btn btn-primary btn-restore-payment-options btn-close-modal">Aceptar</button>
         </div>
     `);
-    
-    selectedSeats = [];
-    $('#ticketDetails').empty().hide();
-    
-    // Configurar el botón para restaurar el contenido
+
+    if (isSuccess) {
+        resetTravelSummary();
+    }
+
     $(document).off('click', '.btn-restore-payment-options').on('click', '.btn-restore-payment-options', function() {
         $modal.find('.modal-body').html(originalContent);
-        initPaymentButtons(); // Re-inicializar los botones de pago
+        initPaymentButtons(); 
     });
 }
 
+function resetTravelSummary() {
+    // Limpiar asientos seleccionados
+    selectedSeats = [];
+    
+    // Resetear la interfaz
+    $('#ticketDetails').empty().hide();
+    $('#selected-seats').empty();
+    $('#total-price').text('$0');
+    
+    // Resetear los asientos visualmente (cambiar reserved a available si es necesario)
+    $('.seat.selected').removeClass('selected').addClass('reserved').off('click');
+    
+    // Mantener la información del viaje (origen, destino, fecha) pero limpiar detalles específicos
+    $('#hora-ida').text('--:--');
+    $('#hora-llegada').text('--:--');
+    $('#bus-plate').text('No disponible');
+    $('#bus-type').text('No disponible');
+    $('#bus-company').text('No disponible');
+    
+    // Opcional: Si quieres limpiar completamente el formulario de búsqueda
+    // $('#searchForm')[0].reset();
+    // $('#serviceList').empty();
+    // $('.contenido-seccion').removeClass('active');
+}
 // Inicializar los botones de pago al cargar la página
 initPaymentButtons();

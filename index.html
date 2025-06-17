@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="css/asientos.css">
   <link rel="stylesheet" href="css/secciones.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
   <title>Venta de Boletos - Buses</title>
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
@@ -112,8 +113,6 @@
             <div id="ticketDetails" class="contenedor-pasajes"></div>
           </div>
         </div>
-
-
       </div>
 
 
@@ -131,7 +130,7 @@
         <div class="info-section price-section">
           <div class="price-detail">
             <span class="label">Total a pagar:</span>
-            <span id="total-price" class="price">$0</span>
+            <span id="total-price" class="price"></span>
           </div>
         </div>
         <div class="info-section">
@@ -141,7 +140,7 @@
               <span class="label">Desde</span>
               <span id="origen" class="city"></span>
             </div>
-            <div class="route-arrow">→</div>
+            <div class="route-arrow"><i class="fa-solid fa-arrow-right"></i></div>
             <div class="location">
               <span class="label">Hacia</span>
               <span id="destino" class="city"></span>
@@ -158,12 +157,12 @@
           <div class="time-info">
             <div class="time-group">
               <span class="label">Salida</span>
-              <span id="hora-ida" class="time">08:00 hrs</span>
+              <span id="hora-ida" class="time"></span>
             </div>
-            <div class="time-arrow">→</div>
+            <div class="time-arrow"><i class="fa-solid fa-clock"></i></div>
             <div class="time-group">
               <span class="label">Llegada aprox.</span>
-              <span id="hora-llegada" class="time">10:30 hrs</span>
+              <span id="hora-llegada" class="time"></span>
             </div>
           </div>
         </div>
@@ -172,9 +171,7 @@
         <div class="info-section">
           <h3 class="section-title">Asientos seleccionados</h3>
           <div id="selected-seats" class="seats-container">
-            <!-- Aquí se insertarán dinámicamente los asientos seleccionados -->
-            <span class="seat-number">A1</span>
-            <span class="seat-number">B3</span>
+
           </div>
         </div>
     
@@ -184,15 +181,15 @@
           <div class="bus-info">
             <div class="bus-detail">
               <span class="label">Patente:</span>
-              <span id="bus-plate" class="detail">AB1234</span>
+              <span id="bus-plate" class="detail"></span>
             </div>
             <div class="bus-detail">
               <span class="label">Tipo:</span>
-              <span id="bus-type" class="detail">Semi Cama</span>
+              <span id="bus-type" class="detail"></span>
             </div>
             <div class="bus-detail">
               <span class="label">Empresa:</span>
-              <span id="bus-company" class="detail">Tur Bus</span>
+              <span id="bus-company" class="detail"></span>
             </div>
           </div>
         </div>
@@ -224,7 +221,8 @@
     </div>
 
 
-    <script src="js/script.js"></script>
+    <script type="module" src="js/script.js"></script>
+
 
 </body>
 
