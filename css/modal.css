@@ -1,0 +1,123 @@
+/* Estilos para modales */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1050;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    overflow-x: hidden;
+    overflow-y: auto;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .modal.show {
+    display: flex;
+  }
+  
+  .modal-dialog {
+    background: white;
+    border-radius: 0.3rem;
+    max-width: 500px;
+    width: 90%;
+    margin: auto;
+    box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
+    animation: fadeInScale 0.3s ease forwards;
+  }
+  
+  @keyframes fadeInScale {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  .modal-header {
+    padding: 1rem;
+    border-bottom: 1px solid #dee2e6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .btn-close {
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    line-height: 1;
+    color: #000;
+    opacity: 0.5;
+  }
+  
+  .btn-close:hover {
+    opacity: 1;
+  }
+  
+  .modal-body {
+    padding: 1rem;
+    text-align: center;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-direction: column;
+  }
+  
+  .btn-primary {
+    background-color: #f37b31;
+    color: white;
+  }
+  
+  .btn-success {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  .btn-secondary {
+    background-color: #6c757d;
+    color: white;
+  }
+  
+  .btn {
+    padding: 10px 20px;
+    border-radius: 50px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+  
+  .modal.show .modal-dialog {
+    transform: translateY(0);
+  }
+  
+  .payment-success, .payment-error {
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .payment-success h4 {
+    color: #28a745;
+  }
+  
+  .payment-error h4 {
+    color: #dc3545;
+  }
+  
+  .loading-payment {
+    padding: 30px;
+    text-align: center;
+    font-size: 1.2rem;
+  }

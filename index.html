@@ -5,9 +5,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="css/styles.css">
-  <link rel="stylesheet" href="css/asientos.css">
-  <link rel="stylesheet" href="css/secciones.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+  <link rel="stylesheet" href="css/forms.css">
+  <link rel="stylesheet" href="css/services.css">
+  <link rel="stylesheet" href="css/seats.css">
+  <link rel="stylesheet" href="css/summary.css">
+  <link rel="stylesheet" href="css/modal.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
   <title>Venta de Boletos - Buses</title>
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
@@ -73,44 +77,50 @@
 
 
     <section class="seccion seccion2">
-      <h3>Distribución de Asientos</h3>
-      <div class="contenido-seccion">
 
-        <div class="distribucion">
-          <div id="seatLayout" class="contenedor-asientos"></div>
+      <div class="contenedor-contenido-seccio2">
+
+
+        <div class="header-seccion2">
+          <h3>Distribución de Asientos</h3>
         </div>
-
-        <div class="listas">
-          <div class="colores">
-            <ul class="lista-colores">
-              <li class="contenedor-color">
-                <div class="color color-1"></div>
-                <div class="nombre-color">
-                  <p>Disponible</p>
-                </div>
-              </li>
-              <li class="contenedor-color">
-                <div class="color color-2"></div>
-                <div class="nombre-color">
-                  <p>Seleccionado</p>
-                </div>
-              </li>
-              <li class="contenedor-color">
-                <div class="color color-3"></div>
-                <div class="nombre-color">
-                  <p>Reservado</p>
-                </div>
-              </li>
-              <li class="contenedor-color">
-                <div class="color color-4"></div>
-                <div class="nombre-color">
-                  <p>Bloqueado</p>
-                </div>
-              </li>
-            </ul>
+        <div class="contenido-seccion">
+          <div class="distribucion">
+            <div id="seatLayout" class="contenedor-asientos"></div>
           </div>
-          <div class="pasajes">
-            <div id="ticketDetails" class="contenedor-pasajes"></div>
+
+          <div class="listas">
+            <div class="colores">
+              <ul class="lista-colores">
+                <li class="contenedor-color">
+                  <div class="color color-1"></div>
+                  <div class="nombre-color">
+                    <p>Disponible</p>
+                  </div>
+                </li>
+                <li class="contenedor-color">
+                  <div class="color color-2"></div>
+                  <div class="nombre-color">
+                    <p>Seleccionado</p>
+                  </div>
+                </li>
+                <li class="contenedor-color">
+                  <div class="color color-3"></div>
+                  <div class="nombre-color">
+                    <p>Reservado</p>
+                  </div>
+                </li>
+                <li class="contenedor-color">
+                  <div class="color color-4"></div>
+                  <div class="nombre-color">
+                    <p>Bloqueado</p>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="pasajes">
+              <div id="ticketDetails" class="contenedor-pasajes"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -122,15 +132,15 @@
     <section class="seccion seccion3">
       <div class="resumen">
         <h2>Resumen de tu viaje</h2>
-    
+
         <!-- Sección de Recorrido -->
         <div class="action-buttons">
         </div><button class="btn btn-primary btn-pagar" id="openPaymentModal">Pagar</button>
-        
+
         <div class="info-section price-section">
           <div class="price-detail">
             <span class="label">Total a pagar:</span>
-            <span id="total-price" class="price"></span>
+            <span id="total-price" class="price">$0</span>
           </div>
         </div>
         <div class="info-section">
@@ -147,13 +157,15 @@
             </div>
           </div>
         </div>
-    
+
         <!-- Sección de Horario -->
         <div class="info-section">
-          <h3 class="section-title">Horario</h3>
-          <div class="date-info">
+          <div class="date-header">
+            <h3 class="section-title">Horario</h3>
             <span id="fecha" class="travel-date"></span>
           </div>
+
+
           <div class="time-info">
             <div class="time-group">
               <span class="label">Salida</span>
@@ -166,7 +178,7 @@
             </div>
           </div>
         </div>
-    
+
         <!-- Sección de Asientos -->
         <div class="info-section">
           <h3 class="section-title">Asientos seleccionados</h3>
@@ -174,7 +186,7 @@
 
           </div>
         </div>
-    
+
         <!-- Sección del Bus -->
         <div class="info-section">
           <h3 class="section-title">Información del Bus</h3>
@@ -193,10 +205,10 @@
             </div>
           </div>
         </div>
-    
+
         <!-- Sección de Precio -->
 
-    
+
       </div>
     </section>
 

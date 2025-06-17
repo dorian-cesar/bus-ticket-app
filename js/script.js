@@ -64,7 +64,7 @@ $('#searchForm').on('submit', function (e) {
 
         data.forEach(service => {
             $('#serviceList').append(`
-                <li class="list-group-item">
+                <li class="list-group-item service-list-item" data-service-id="${service.id}"">
                     <div class="contenido-item">
                         <div class="contenido-servicio">
                             <div class="header-servicio">
@@ -101,6 +101,9 @@ $(document).on('click', '.selectServiceBtn', function () {
     const serviceId = $(this).data('id');
     currentServiceId = serviceId;
     selectedSeats = [];
+
+    $('.service-list-item').removeClass('selected');
+    $(this).closest('.service-list-item').addClass('selected');
 
     $('#selected-seats').empty();
     $('#total-price').text('$0');
@@ -400,8 +403,12 @@ function resetTravelSummary() {
     
     // Resetear los asientos visualmente (cambiar reserved a available si es necesario)
     $('.seat.selected').removeClass('selected').addClass('reserved').off('click');
+    $('.seccion2').removeClass('active')
     
     // Mantener la información del viaje (origen, destino, fecha) pero limpiar detalles específicos
+    $('#origen').text('-----');
+    $('#destino').text('-----');
+    $('#fecha').text('----/--/--');
     $('#hora-ida').text('--:--');
     $('#hora-llegada').text('--:--');
     $('#bus-plate').text('No disponible');
@@ -409,9 +416,9 @@ function resetTravelSummary() {
     $('#bus-company').text('No disponible');
     
     // Opcional: Si quieres limpiar completamente el formulario de búsqueda
-    // $('#searchForm')[0].reset();
-    // $('#serviceList').empty();
-    // $('.contenido-seccion').removeClass('active');
+    $('#searchForm')[0].reset();
+    $('#serviceList').empty();
+    $('.contenido-seccion').removeClass('active');
 }
 // Inicializar los botones de pago al cargar la página
 initPaymentButtons();
