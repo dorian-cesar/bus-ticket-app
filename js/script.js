@@ -156,6 +156,10 @@ $(document).on('click', '.selectServiceBtn', function () {
     });
 });
 
+function getTotalPrice() {
+    return selectedSeats.reduce((sum, seat) => sum + seat.price, 0);
+}
+
 function updateTravelSummary(origin, destination, date, departureTime, arrivalTime) {
     $('#origen').text(origin);
     $('#destino').text(destination);
@@ -169,9 +173,7 @@ function updateTravelSummary(origin, destination, date, departureTime, arrivalTi
         $('#bus-type').text(currentServiceData.busTypeDescription || 'No disponible');
         $('#bus-company').text(currentServiceData.company || 'No disponible');
 
-        // Calcular y mostrar el precio total
-        const total = selectedSeats.reduce((sum, seat) => sum + seat.price, 0);
-        $('#total-price').text('$' + total);
+        $('#total-price').text('$' + getTotalPrice());
     }
 
     $('.seccion3').addClass('active');
@@ -179,7 +181,7 @@ function updateTravelSummary(origin, destination, date, departureTime, arrivalTi
 
 $(document).on('click', '.seat.available, .seat.selected', function () {
 
-    const seat = String($(this).data('seat')); 
+    const seat = String($(this).data('seat'));
     const floor = $(this).data('floor');
     const index = selectedSeats.findIndex(s => s.seat === seat);
 
@@ -225,7 +227,7 @@ $(document).on('click', '.seat.available, .seat.selected', function () {
                 alert('El asiento ha sido ocupado');
                 const $serviceBtn = $(`.selectServiceBtn[data-id="${currentServiceId}"]`);
                 if ($serviceBtn.length) {
-                    $serviceBtn.trigger('click'); 
+                    $serviceBtn.trigger('click');
                 }
             }
         });
@@ -239,7 +241,7 @@ function updateTicketDetails() {
         $ticketDetails.empty().hide();
         $('#total-price').text('$0');
         $('#selected-seats').empty();
-        
+
         return;
     }
 
@@ -253,8 +255,7 @@ function updateTicketDetails() {
 
     $ticketDetails.html(html).hide().fadeIn(300);
 
-    const total = selectedSeats.reduce((sum, seat) => sum + seat.price, 0);
-    $('#total-price').text('$' + total);
+    $('#total-price').text('$' + getTotalPrice());
 
     $('#selected-seats').empty();
     selectedSeats.forEach(seat => {
@@ -364,25 +365,25 @@ function showPaymentResult($modal, originalContent, isSuccess) {
         resetTravelSummary();
     }
 
-    $(document).off('click', '.btn-restore-payment-options').on('click', '.btn-restore-payment-options', function() {
+    $(document).off('click', '.btn-restore-payment-options').on('click', '.btn-restore-payment-options', function () {
         $modal.find('.modal-body').html(originalContent);
-        initPaymentButtons(); 
+        initPaymentButtons();
     });
 }
 
 function resetTravelSummary() {
     // Limpiar asientos seleccionados
     selectedSeats = [];
-    
+
     // Resetear la interfaz
     $('#ticketDetails').empty().hide();
     $('#selected-seats').empty();
     $('#total-price').text('$0');
-    
+
     // Resetear los asientos visualmente (cambiar reserved a available si es necesario)
     $('.seat.selected').removeClass('selected').addClass('reserved').off('click');
     $('.seccion2').removeClass('active')
-    
+
     // Mantener la información del viaje (origen, destino, fecha) pero limpiar detalles específicos
     $('#origen').text('-----');
     $('#destino').text('-----');
@@ -392,7 +393,7 @@ function resetTravelSummary() {
     $('#bus-plate').text('No disponible');
     $('#bus-type').text('No disponible');
     $('#bus-company').text('No disponible');
-    
+
     // Opcional: Si quieres limpiar completamente el formulario de búsqueda
     $('#searchForm')[0].reset();
     $('#serviceList').empty();
