@@ -1,15 +1,5 @@
 /* Estilos para la sección de asientos */
-.seccion2 {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    flex-wrap: wrap; /* Opcional, si quieres que los bloques se acomoden */
-    overflow-y: auto; /* <--- Esto es lo importante */
-    max-height: calc(100vh - 80px); /* Ajusta este valor según el alto de tu header */
-    opacity: 1;
-    transform: translateY(0);
-  }
+
   .contenedor-contenido-seccio2{
     height: 100%;
     width: 100%;

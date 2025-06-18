@@ -15,6 +15,7 @@ body, html {
   width: 100%;
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   height: calc(100vh - 80px);
 } 
 
@@ -70,6 +71,61 @@ body, html {
 
 /* Firefox */
 .seccion {
+  flex: 1 1 500px;
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.1);
+}
+
+.seccion1 {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  max-height: calc(100vh - 80px);
+  color: #fff;
+}
+
+.seccion2 {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow-y: auto; /* <--- Esto es lo importante */
+  max-height: calc(100vh - 80px); /* Ajusta este valor según el alto de tu header */
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.seccion3 {
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 40px 20px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  padding: 30px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  max-height: calc(100vh - 80px);
+}
+
+@media (max-width: 1500px) {
+  html, body{
+    overflow-y: auto;
+  }
+}
+
+@media (max-width: 1000px) {
+  html, body{
+    overflow-y: auto;
+  }
+  .contenedor {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .seccion {
+    flex: none;
+    width: 100%;
+    height: auto;
+  }
 }
