@@ -2,17 +2,7 @@
 
 console.log("script cargado");
 
-async function obtenertoken() {
-    try {
-        const res = await fetch('http://localhost:3000/api/token');
-        if (!res.ok) throw new Error('Error al obtener token');
-
-        const data = await res.json();
-        return data.token;
-    } catch (error) {
-        return null;
-    }
-}
+const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNzUwMjU1NTA5fQ.YKrMhJmekhIDikUK2J_tv4DDK2jHi-8W8mufMb4k6LU'
 
 let currentServiceId = '';
 let selectedSeats = [];
@@ -187,13 +177,7 @@ function updateTravelSummary(origin, destination, date, departureTime, arrivalTi
     $('.seccion3').addClass('active');
 }
 
-$(document).on('click', '.seat.available, .seat.selected', async function () {
-    const token = await obtenertoken();
-
-    if (!token) {
-        alert('No se pudo obtener reservar el asiento, intente en unos minutos');
-        return;
-    }
+$(document).on('click', '.seat.available, .seat.selected', function () {
 
     const seat = String($(this).data('seat')); 
     const floor = $(this).data('floor');
@@ -205,7 +189,7 @@ $(document).on('click', '.seat.available, .seat.selected', async function () {
             url: 'https://boletos.dev-wit.com/api/services/revert-seat',
             method: 'PATCH',
             headers: {
-                Authorization: `Bearer ${token}`,
+                Authorization: token,
                 'Content-Type': 'application/json'
             },
             data: JSON.stringify({
@@ -227,7 +211,7 @@ $(document).on('click', '.seat.available, .seat.selected', async function () {
             url: `https://boletos.dev-wit.com/api/seats/${currentServiceId}/reserve`,
             method: 'POST',
             headers: {
-                Authorization: `Bearer ${token}`,
+                Authorization: token,
                 'Content-Type': 'application/json'
             },
             data: JSON.stringify({ seatNumber: String(seat), userId: 'usuario123' }),
@@ -316,12 +300,6 @@ function initPaymentButtons() {
 
 // Función principal de manejo de pagos
 async function handlePayment() {
-    const token = await obtenertoken();
-
-    if (!token) {
-        alert('No se pudo procesar el pago, intente en unos minutos');
-        return;
-    }
 
     const method = this.id === 'payWeb' ? 'web' : 'cash';
     const authCode = method === 'web' ? 'AUTHWEB123' : 'AUTHCASH123';
@@ -346,7 +324,7 @@ async function handlePayment() {
             url: `https://boletos.dev-wit.com/api/seats/${currentServiceId}/confirm`,
             method: 'POST',
             headers: {
-                Authorization: `Bearer ${token}`,
+                Authorization: token,
                 'Content-Type': 'application/json'
             },
             data: JSON.stringify({
