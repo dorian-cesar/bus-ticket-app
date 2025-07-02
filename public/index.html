@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/forms.css">
+  <link rel="stylesheet" href="css/services.css">
+  <link rel="stylesheet" href="css/seats.css">
+  <link rel="stylesheet" href="css/summary.css">
+  <link rel="stylesheet" href="css/modal.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <title>Venta de Boletos - Buses</title>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+</head>
+
+<body>
+  <div class="nav-tickets">
+    <h2>Venta de Boletos</h2>
+  </div>
+  <div class="contenedor">
+
+    <section class="seccion seccion1">
+      <div class="form-container">
+        <form id="searchForm" class="formulario">
+          <div class="form-header">
+            <h3 class="title-form">¡Planifica tu viaje!</h3>
+            <p class="subtitle-form">Selecciona tus datos de viaje</p>
+          </div>
+
+          <div class="input-group">
+            <div class="input-formulario">
+              <label for="origin" class="form-label">
+                <i class="fas fa-map-marker-alt"></i> Ciudad de Origen
+              </label>
+              <select id="origin" class="form-select" required>
+                <option value="" disabled selected>Selecciona tu origen</option>
+              </select>
+            </div>
+
+            <div class="input-formulario">
+              <label for="destination" class="form-label">
+                <i class="fas fa-map-marker-alt"></i> Ciudad de Destino
+              </label>
+              <select id="destination" class="form-select" required>
+                <option value="" disabled selected>Selecciona tu destino</option>
+              </select>
+            </div>
+
+            <div class="input-formulario">
+              <label for="date" class="form-label">
+                <i class="fas fa-calendar-alt"></i> Fecha del Viaje
+              </label>
+              <input type="date" id="date" class="form-control" required>
+            </div>
+          </div>
+
+          <div class="btn-formulario">
+            <button type="submit" class="btn btn-submit">
+              <i class="fas fa-search"></i> Buscar Servicios
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div class="servicios">
+        <div class="servicios-header">
+          <h3>Servicios disponibles</h3>
+          <p id="search-results-text" class="results-text"></p>
+        </div>
+        <ul id="serviceList" class="list-group"></ul>
+      </div>
+    </section>
+
+
+    <section class="seccion seccion2">
+
+      <div class="contenedor-contenido-seccio2">
+
+
+        <div class="header-seccion2">
+          <h3>Distribución de Asientos</h3>
+        </div>
+        <div class="contenido-seccion">
+          <div class="distribucion">
+            <div id="seatLayout" class="contenedor-asientos"></div>
+          </div>
+
+          <div class="listas">
+            <div class="colores">
+              <ul class="lista-colores">
+                <li class="contenedor-color">
+                  <div class="color color-1"></div>
+                  <div class="nombre-color">
+                    <p>Disponible</p>
+                  </div>
+                </li>
+                <li class="contenedor-color">
+                  <div class="color color-2"></div>
+                  <div class="nombre-color">
+                    <p>Seleccionado</p>
+                  </div>
+                </li>
+                <li class="contenedor-color">
+                  <div class="color color-3"></div>
+                  <div class="nombre-color">
+                    <p>Reservado</p>
+                  </div>
+                </li>
+                <li class="contenedor-color">
+                  <div class="color color-4"></div>
+                  <div class="nombre-color">
+                    <p>Bloqueado</p>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="pasajes">
+              <div id="ticketDetails" class="contenedor-pasajes"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+    </section>
+
+
+    <section class="seccion seccion3">
+      <div class="resumen">
+        <h2>Resumen de tu viaje</h2>
+
+        <!-- Sección de Recorrido -->
+        <div class="action-buttons">
+        </div><button class="btn btn-primary btn-pagar" id="openPaymentModal">Pagar</button>
+
+        <div class="info-section price-section">
+          <div class="price-detail">
+            <span class="label">Total a pagar:</span>
+            <span id="total-price" class="price">$0</span>
+          </div>
+        </div>
+        <div class="info-section">
+          <h3 class="section-title">Recorrido</h3>
+          <div class="route-info">
+            <div class="location">
+              <span class="label">Desde</span>
+              <span id="origen" class="city"></span>
+            </div>
+            <div class="route-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="location">
+              <span class="label">Hacia</span>
+              <span id="destino" class="city"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sección de Horario -->
+        <div class="info-section">
+          <div class="date-header">
+            <h3 class="section-title">Horario</h3>
+            <span id="fecha" class="travel-date"></span>
+          </div>
+
+
+          <div class="time-info">
+            <div class="time-group">
+              <span class="label">Salida</span>
+              <span id="hora-ida" class="time"></span>
+            </div>
+            <div class="time-arrow"><i class="fa-solid fa-clock"></i></div>
+            <div class="time-group">
+              <span class="label">Llegada aprox.</span>
+              <span id="hora-llegada" class="time"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sección de Asientos -->
+        <div class="info-section">
+          <h3 class="section-title">Asientos seleccionados</h3>
+          <div id="selected-seats" class="seats-container">
+
+          </div>
+        </div>
+
+        <!-- Sección del Bus -->
+        <div class="info-section">
+          <h3 class="section-title">Información del Bus</h3>
+          <div class="bus-info">
+            <div class="bus-detail">
+              <span class="label">Patente:</span>
+              <span id="bus-plate" class="detail"></span>
+            </div>
+            <div class="bus-detail">
+              <span class="label">Tipo:</span>
+              <span id="bus-type" class="detail"></span>
+            </div>
+            <div class="bus-detail">
+              <span class="label">Empresa:</span>
+              <span id="bus-company" class="detail"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sección de Precio -->
+
+
+      </div>
+    </section>
+
+
+
+
+    <!-- Modal de Pago -->
+    <div class="modal" id="paymentModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Seleccionar Método de Pago</h5>
+            <button type="button" class="btn-close" aria-label="Cerrar modal"></button>
+          </div>
+          <div class="modal-body">
+            <button id="payWeb" class="btn btn-primary">Pago Web</button>
+            <button id="payCash" class="btn btn-success">Pago en Efectivo</button>
+            <button class="btn btn-secondary btn-close-modal">Cancelar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <script type="module" src="js/script.js"></script>
+
+
+</body>
+
+</html>

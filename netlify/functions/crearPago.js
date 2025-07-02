@@ -1,0 +1,73 @@
+import crypto from 'crypto';
+
+const API_KEY = process.env.FLOW_API_KEY;
+const SECRET_KEY = process.env.FLOW_SECRET_KEY;
+const URL = process.env.FLOW_URL;
+
+const FLOW_API_URL = `${URL}/payment/create`;
+
+function generarFirma(params, secretKey) {
+  const keys = Object.keys(params).sort();
+  let toSign = "";
+  keys.forEach(k => {
+    toSign += k + params[k];
+  });
+  return crypto.createHmac('sha256', secretKey).update(toSign).digest('hex');
+}
+
+export async function handler(event) {
+  try {
+    // Recibe datos del frontend (por ejemplo monto, orden)
+    const body = JSON.parse(event.body);
+    const { amount, orderId, urlReturn, urlConfirmation } = body;
+
+    // Prepara parámetros para Flow
+    const params = {
+      apiKey: API_KEY,
+      amount: amount.toString(),
+      currency: "CLP",
+      orderId,
+      urlReturn,
+      urlConfirmation
+    };
+
+    // Firma los parámetros
+    const signature = generarFirma(params, SECRET_KEY);
+    params.s = signature;
+
+    // Convierte params a x-www-form-urlencoded
+    const formBody = new URLSearchParams(params);
+
+    // Llama a Flow para crear la transacción
+    const res = await fetch(FLOW_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: formBody.toString()
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      return { statusCode: 500, body: `Error Flow API: ${errorText}` };
+    }
+
+    const data = await res.json();
+
+    // Devuelve URL para redirigir al usuario
+    return {
+      statusCode: 200,
+      body: JSON.stringify({
+        url: data.url,
+        flowData: data
+      }),
+      headers: { 'Content-Type': 'application/json' }
+    };
+
+  } catch (error) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: error.message })
+    };
+  }
+}

@@ -1,0 +1,159 @@
+/* Estilos para la sección de asientos */
+
+  .contenedor-contenido-seccio2{
+    height: 100%;
+    width: 100%;
+  }
+  .seccion2 h3 {
+    font-size: 1.8rem;
+    color: white;
+  }
+  .header-seccion2{
+    text-align: center;
+  }
+  .contenido-seccion {
+    display: none;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+    width: 100%;
+    gap: 20px;
+  }
+  
+  .contenido-seccion.active {
+    display: flex;
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  .distribucion {
+    background-color: #004ca6;
+    color: white;
+    padding: 30px;
+    border-radius: 15px;
+  }
+  
+  .fila {
+    display: grid;
+    grid-template-columns: repeat(5, 50px);
+    gap: 0;
+    justify-content: center;
+  }
+  
+  .listas {
+    width: 250px;
+  }
+  
+  .seat {
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    line-height: 40px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 10px;
+    transition: all 0.2s ease;
+  }
+  
+  .seat:hover:not(.reserved):not(.locked):not(.empty) {
+    transform: scale(1.1);
+    box-shadow: 0 0 10px rgba(255,255,255,0.5);
+  }
+  
+  .available {
+    background-color: #fff;
+    color: black;
+  }
+  
+  .selected {
+    background-color: #f37b31;
+    color: white;
+  }
+  
+  .reserved {
+    background-color: #ffc107;
+    color: white;
+    cursor: not-allowed;
+  }
+  
+  .empty {
+    background: transparent;
+    border: none;
+  }
+  
+  .locked {
+    background-color: #6c757d;
+    color: white;
+    cursor: not-allowed;
+  }
+  
+  /* Colores de referencia */
+  .colores {
+    list-style: none;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    color: #fff;
+    border-radius: 15px;
+    font-weight: bold;
+  }
+  
+  .lista-colores {
+    padding: 0;
+    list-style: none;
+    margin: 0 0 50px;
+    padding: 10px 0 10px 10px;
+    width: 100%;
+  }
+  
+  .contenedor-color {
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .nombre-color {
+    color: white;
+    font-size: 1rem;
+    font-weight: normal;
+  }
+  
+  .color {
+    width: 40px;
+    height: 40px;
+    border-radius: 5px;
+  }
+  
+  .color-1 {
+    background: #ffffff;
+  }
+  .color-2 {
+    background: #f37b31;
+  }
+  .color-3 {
+    background: #ffc107;
+  }
+  .color-4 {
+    background: #6c757d;
+  }
+  
+  /* Lista de asientos seleccionados */
+  .lista-asientos {
+    padding: 0;
+    margin: 0;
+  }
+  
+  .lista-asientos-item {
+    list-style: none;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 20px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    color: #fff;
+    margin-top: 10px;
+    border-radius: 15px;
+    font-weight: bold;
+  }
