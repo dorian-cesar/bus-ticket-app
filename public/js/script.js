@@ -364,7 +364,11 @@ async function handlePayment() {
 
             if (data.url) {
                 localStorage.setItem('lastOrderId', orderId);
-                window.location.href = data.url;
+                const paymentWindow = window.open(data.url, 'FlowPayment', 'width=500,height=700');
+                if (!paymentWindow) {
+                    alert('Por favor, habilita los popups para este sitio');
+                }
+
                 return;
             } else {
                 alert("Error al iniciar pago con Flow");
