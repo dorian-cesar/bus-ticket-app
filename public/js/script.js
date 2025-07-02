@@ -123,7 +123,6 @@ $(document).on('click', '.selectServiceBtn', function () {
             currentServiceData.arrivalTime
         );
 
-        const layout = currentServiceData.layout;
 
         $.get(`https://boletos.dev-wit.com/api/seats/${serviceId}`, function (seatStatusData) {
             $('#seatLayout').empty();
@@ -148,10 +147,16 @@ $(document).on('click', '.selectServiceBtn', function () {
                     $('#seatLayout').append(rowDiv);
                 });
             };
+            const layout = currentServiceData.layout;
 
-            if (layout.floor1) renderSeats('Primer Piso', layout.floor1.seatMap, 1);
-            if (layout.floor2) renderSeats('Segundo Piso', layout.floor2.seatMap, 2);
-            if (layout.seatMap) renderSeats('Único Piso', layout.seatMap, 1);
+            if (layout) {
+                if (layout.floor1) renderSeats('Primer Piso', layout.floor1.seatMap, 1);
+                if (layout.floor2) renderSeats('Segundo Piso', layout.floor2.seatMap, 2);
+                if (layout.seatMap) renderSeats('Único Piso', layout.seatMap, 1);
+            } else {
+                $('#seatLayout').append('<div class="error">No hay plano de asientos disponible para este servicio.</div>');
+            }
+
             $('.contenido-seccion').addClass('active');
         }).fail(() => {
             $('#seatLayout').empty().append('<div class="error">Error al cargar asientos</div>');
@@ -345,7 +350,7 @@ async function handlePayment() {
                 body: JSON.stringify({
                     amount,
                     orderId,
-                    urlReturn: `${window.location.origin}/?payment_status=success&orderId=${orderId}`,
+                    urlReturn: `${urlBase}/public/index.html`,
                     urlConfirmation: `${urlBase}/.netlify/functions/flowCallback`
                 })
             });
@@ -408,15 +413,13 @@ window.addEventListener('DOMContentLoaded', () => {
     const orderId = urlParams.get('orderId');
 
     if (paymentStatus === 'success' && orderId) {
-        $('#paymentModal .modal-body').html(`
-            <div class="payment-success text-center">
-              <h4>¡Pago exitoso!</h4>
-              <p>Orden #${orderId} confirmada. Recibirás un email con los detalles.</p>
-              <button class="btn btn-primary btn-close-modal mt-3">Aceptar</button>
-            </div>
-          `);
-        $('#paymentModal').fadeIn().addClass('show');
-
+        $('#paymentModal').html(`
+        <div class="payment-success">
+          <h4>¡Pago exitoso!</h4>
+          <p>Orden #${orderId} confirmada. Recibirás un email con los detalles.</p>
+          <button class="btn btn-primary btn-close-modal">Aceptar</button>
+        </div>
+      `).fadeIn();
     }
 });
 
