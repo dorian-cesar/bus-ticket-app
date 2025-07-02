@@ -6,6 +6,8 @@ const URL = process.env.FLOW_URL;
 
 const FLOW_API_URL = `${URL}/payment/create`;
 
+const urlBase = process.env.URL_BASE || "https://bus-boleteria.netlify.app";
+
 function generarFirma(params, secretKey) {
   const keys = Object.keys(params).sort();
   let toSign = "";
@@ -20,15 +22,22 @@ export async function handler(event) {
     // Recibe datos del frontend (por ejemplo monto, orden)
     const body = JSON.parse(event.body);
     const { amount, orderId, urlReturn, urlConfirmation } = body;
+    if (!amount || !orderId || !urlReturn || !urlConfirmation) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Faltan parámetros obligatorios" })
+      };
+    }
+
 
     // Prepara parámetros para Flow
     const params = {
       apiKey: API_KEY,
+      commerceOrder: orderId,
       amount: amount.toString(),
       currency: "CLP",
-      orderId,
-      urlReturn,
-      urlConfirmation
+      urlReturn: `${urlBase}/?payment_status=success&orderId=${orderId}`,
+      urlConfirmation: `${urlBase}/.netlify/functions/flowCallback`,
     };
 
     // Firma los parámetros
@@ -53,6 +62,10 @@ export async function handler(event) {
     }
 
     const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || "Error en Flow");
+    }
 
     // Devuelve URL para redirigir al usuario
     return {

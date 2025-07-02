@@ -23,31 +23,36 @@ export async function handler(event) {
 
   try {
     // Flow envía los datos como application/x-www-form-urlencoded
-    const params = new URLSearchParams(event.body);
-    const token = params.get('token');
+    const params = Object.fromEntries(new URLSearchParams(event.body));
+    const signature = generarFirma(params, SECRET_KEY);
 
-    if (!token) {
-      return { statusCode: 400, body: 'Token no entregado' };
+
+    if (params.s !== signature) {
+      return { statusCode: 401, body: 'Firma inválida' };
     }
 
-    // Prepara parámetros para consultar estado del pago
-    const data = {
-      apiKey: API_KEY,
-      token: token
-    };
-
-    const signature = generarFirma(data, SECRET_KEY);
-    data.s = signature;
+    const statusData = { apiKey: API_KEY, token: params.token };
+    statusData.s = generarFirma(statusData, SECRET_KEY);
 
     const statusRes = await fetch(FLOW_GETSTATUS_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams(data).toString()
+      body: new URLSearchParams(statusData).toString()
     });
 
     const result = await statusRes.json();
 
-    console.log("✅ Estado de pago recibido desde Flow:", result);
+    console.log("pago enviado", result);
+
+    if (result.status === 'paid') {
+      const orderId = result.commerceOrder; // Ej: "orden_123456"      
+      console.log("confirmar asientos")
+    }
+
+    if (result.status !== 'paid') {
+      console.log("❌ Pago no aprobado. Estado:", result.status);
+      return { statusCode: 400, body: 'Pago no completado' };
+    }
 
     return {
       statusCode: 200,

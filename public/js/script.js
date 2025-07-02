@@ -399,23 +399,22 @@ async function handlePayment() {
             });
         });
     }
-    // Simular pago y confirmar asientos
 
 }
 
-window.addEventListener('DOMContentLoaded', async () => {
-    const orderId = localStorage.getItem('lastOrderId');
-    if (orderId) {
-        // Aquí puedes mostrar tu modal de éxito
-        $('#paymentModal').fadeIn(300).addClass('show');
-        $('.modal-body').html(`
+window.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const paymentStatus = urlParams.get('payment_status');
+    const orderId = urlParams.get('orderId');
+
+    if (paymentStatus === 'success' && orderId) {
+        $('#paymentModal').html(`
         <div class="payment-success">
-            <h4>¡Pago exitoso!</h4>
-            <p>Tu orden ${orderId} ha sido procesada correctamente.</p>
-            <button class="btn btn-primary btn-close-modal">Aceptar</button>
+          <h4>¡Pago exitoso!</h4>
+          <p>Orden #${orderId} confirmada. Recibirás un email con los detalles.</p>
+          <button class="btn btn-primary btn-close-modal">Aceptar</button>
         </div>
-      `);
-        localStorage.removeItem('lastOrderId');
+      `).fadeIn();
     }
 });
 
