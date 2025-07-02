@@ -355,7 +355,7 @@ async function handlePayment() {
                 body: JSON.stringify({
                     amount,
                     orderId,
-                    urlReturn: `${urlBase}/public/index.html`,
+                    urlReturn: `${urlBase}/return.html`,
                     urlConfirmation: `${urlBase}/.netlify/functions/flowCallback`
                 })
             });

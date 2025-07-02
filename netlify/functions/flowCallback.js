@@ -34,8 +34,8 @@ export async function handler(event) {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams(statusData).toString()
-    });
-
+    });                                                                                                
+    
     const result = await statusRes.json();
     
     if (!statusRes.ok) {

@@ -1,0 +1,26 @@
+<!-- return.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Resultado del Pago</title>
+</head>
+<body>
+  <h1 id="status"></h1>
+  <p id="orden"></p>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const status = urlParams.get('payment_status');
+    const orderId = urlParams.get('orderId');
+
+    document.getElementById('status').textContent = status === 'success' 
+      ? '✅ ¡Pago exitoso!'
+      : '❌ Pago no completado';
+
+    document.getElementById('orden').textContent = orderId
+      ? 'Orden: ' + orderId
+      : 'Sin número de orden';
+  </script>
+</body>
+</html>

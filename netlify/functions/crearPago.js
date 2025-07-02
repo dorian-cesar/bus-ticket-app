@@ -39,14 +39,12 @@ export async function handler(event) {
     const params = {
       apiKey: API_KEY,
       commerceOrder: orderId,
-      amount: amount.toString(), // Asegurar que sea string
+      amount: amount, // Asegurar que sea string
       currency: "CLP",
-      urlReturn: `${urlBase}/public/index.html`,
+      urlReturn: `${urlBase}/return.html`,
       urlConfirmation: `${urlBase}/.netlify/functions/flowCallback`,
       subject: "Compra de pasajes",
       email: "dgonzalez@wit.la",
-      // Agrega más parámetros requeridos por Flow
-      paymentMethod: "1", 
       timeout: "360" // Tiempo en minutos
     };
 
