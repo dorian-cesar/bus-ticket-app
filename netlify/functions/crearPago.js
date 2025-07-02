@@ -2,11 +2,9 @@ import crypto from 'crypto';
 
 const API_KEY = process.env.FLOW_API_KEY;
 const SECRET_KEY = process.env.FLOW_SECRET_KEY;
-const URL = process.env.FLOW_URL;
+const FLOW_URL = process.env.FLOW_URL;
 
-const FLOW_API_URL = `${URL}/payment/create`;
-
-const urlBase = process.env.URL_BASE || "https://bus-boleteria.netlify.app";
+const FLOW_API_URL = `${FLOW_URL}/payment/create`;
 
 function generarFirma(params, secretKey) {
   const keys = Object.keys(params).sort();
@@ -19,57 +17,67 @@ function generarFirma(params, secretKey) {
 
 export async function handler(event) {
   try {
-    // Recibe datos del frontend (por ejemplo monto, orden)
     const body = JSON.parse(event.body);
-    const { amount, orderId, urlReturn, urlConfirmation } = body;
-    if (!amount || !orderId || !urlReturn || !urlConfirmation) {
+    const { amount, orderId } = body;
+    if (isNaN(amount) || Number(amount) <= 0) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: "Faltan parámetros obligatorios" })
+        body: JSON.stringify({ error: "El monto debe ser un número positivo" })
       };
     }
 
+    if (!amount || !orderId) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Faltan parámetros obligatorios (amount, orderId)" })
+      };
+    }
 
-    // Prepara parámetros para Flow
+    // Asegúrate de que la URL base sea accesible desde internet
+    const urlBase = process.env.URL_BASE || "https://bus-boleteria.netlify.app";
+
     const params = {
       apiKey: API_KEY,
       commerceOrder: orderId,
-      amount: amount,
+      amount: amount.toString(), // Asegurar que sea string
       currency: "CLP",
-      urlReturn: urlReturn,
+      urlReturn: `${urlBase}/public/index.html`,
       urlConfirmation: `${urlBase}/.netlify/functions/flowCallback`,
       subject: "Compra de pasajes",
-      email: "sandoval.jesus2005@gmail.com"
+      email: "dgonzalez@wit.la",
+      // Agrega más parámetros requeridos por Flow
+      paymentMethod: "1", 
+      timeout: "360" // Tiempo en minutos
     };
 
-    // Firma los parámetros
+    // Ordenar y firmar
     const signature = generarFirma(params, SECRET_KEY);
     params.s = signature;
 
-    // Convierte params a x-www-form-urlencoded
-    const formBody = new URLSearchParams(params);
+    // Debug: Mostrar parámetros que se enviarán
+    console.log("Parámetros a enviar a Flow:", params);
 
-    // Llama a Flow para crear la transacción
-    const res = await fetch(FLOW_API_URL, {
+    const response = await fetch(FLOW_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       },
-      body: formBody.toString()
+      body: new URLSearchParams(params).toString()
     });
 
-    if (!res.ok) {
-      const errorText = await res.text();
-      return { statusCode: 500, body: `Error Flow API: ${errorText}` };
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error("Error en respuesta de Flow:", data);
+      return {
+        statusCode: 500,
+        body: JSON.stringify({
+          error: "Error en Flow API",
+          flowError: data
+        })
+      };
     }
 
-    const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data.error || "Error en Flow");
-    }
-
-    // Devuelve URL para redirigir al usuario
     return {
       statusCode: 200,
       body: JSON.stringify({
@@ -80,9 +88,13 @@ export async function handler(event) {
     };
 
   } catch (error) {
+    console.error("Error general:", error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: error.message })
+      body: JSON.stringify({
+        error: error.message,
+        stack: error.stack
+      })
     };
   }
 }

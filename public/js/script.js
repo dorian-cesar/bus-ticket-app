@@ -279,6 +279,7 @@ function updateTicketDetails() {
     selectedSeats.forEach(seat => {
         $('#selected-seats').append(`<span class="seat-number">${seat.seat}</span>`);
     });
+    console.log(getTotalPrice())
 }
 
 
@@ -342,7 +343,11 @@ async function handlePayment() {
     if (this.id === 'payWeb') {
         try {
             const amount = getTotalPrice();
-            const orderId = generarIdUnico();      // genera un id único para la orden
+            const orderId = generarIdUnico();
+            if (isNaN(amount) || Number(amount) <= 0) {
+                console.log("es un string")
+                return;
+            }
 
             const res = await fetch('/.netlify/functions/crearPago', {
                 method: 'POST',
