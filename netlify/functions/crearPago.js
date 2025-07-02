@@ -36,7 +36,7 @@ export async function handler(event) {
       commerceOrder: orderId,
       amount: amount.toString(),
       currency: "CLP",
-      urlReturn: `${urlBase}/?payment_status=success&orderId=${orderId}`,
+      urlReturn: urlReturn,
       urlConfirmation: `${urlBase}/.netlify/functions/flowCallback`,
       subject: "Compra de pasajes",
       email: "sandoval.jesus2005@gmail.com"

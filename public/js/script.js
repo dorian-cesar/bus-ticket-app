@@ -345,7 +345,7 @@ async function handlePayment() {
                 body: JSON.stringify({
                     amount,
                     orderId,
-                    urlReturn: `${urlBase}/public/index.html`,
+                    urlReturn: `${window.location.origin}/?payment_status=success&orderId=${orderId}`,
                     urlConfirmation: `${urlBase}/.netlify/functions/flowCallback`
                 })
             });
@@ -408,13 +408,15 @@ window.addEventListener('DOMContentLoaded', () => {
     const orderId = urlParams.get('orderId');
 
     if (paymentStatus === 'success' && orderId) {
-        $('#paymentModal').html(`
-        <div class="payment-success">
-          <h4>¡Pago exitoso!</h4>
-          <p>Orden #${orderId} confirmada. Recibirás un email con los detalles.</p>
-          <button class="btn btn-primary btn-close-modal">Aceptar</button>
-        </div>
-      `).fadeIn();
+        $('#paymentModal .modal-body').html(`
+            <div class="payment-success text-center">
+              <h4>¡Pago exitoso!</h4>
+              <p>Orden #${orderId} confirmada. Recibirás un email con los detalles.</p>
+              <button class="btn btn-primary btn-close-modal mt-3">Aceptar</button>
+            </div>
+          `);
+        $('#paymentModal').fadeIn().addClass('show');
+
     }
 });
 
