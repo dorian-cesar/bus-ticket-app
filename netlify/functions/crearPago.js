@@ -38,6 +38,8 @@ export async function handler(event) {
       currency: "CLP",
       urlReturn: `${urlBase}/?payment_status=success&orderId=${orderId}`,
       urlConfirmation: `${urlBase}/.netlify/functions/flowCallback`,
+      subject: "Compra de pasajes",
+      email: "sandoval.jesus2005@gmail.com"
     };
 
     // Firma los parámetros
