@@ -7,13 +7,14 @@ const FLOW_URL = process.env.FLOW_URL;
 const FLOW_API_URL = `${FLOW_URL}/payment/create`;
 
 function generarFirma(params, secretKey) {
-  const keys = Object.keys(params).sort();
+  const keys = Object.keys(params).filter(k => k !== 's').sort(); // 🔥 Excluye 's'
   let toSign = "";
   keys.forEach(k => {
     toSign += k + params[k];
   });
   return crypto.createHmac('sha256', secretKey).update(toSign).digest('hex');
 }
+
 
 export async function handler(event) {
   try {
@@ -33,19 +34,18 @@ export async function handler(event) {
       };
     }
 
-    // Asegúrate de que la URL base sea accesible desde internet
+
     const urlBase = process.env.URL_BASE || "https://bus-boleteria.netlify.app";
 
     const params = {
       apiKey: API_KEY,
       commerceOrder: orderId,
-      amount: amount.toString(), // Asegurar que sea string
+      amount: amount.toString(),
       currency: "CLP",
       urlReturn: `${urlBase}/return.html`,
       urlConfirmation: `${urlBase}/.netlify/functions/flowCallback`,
       subject: "Compra de pasajes",
       email: "dgonzalez@wit.la",
-      timeout: "360" // Tiempo en minutos
     };
 
     // Ordenar y firmar

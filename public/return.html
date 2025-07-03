@@ -9,8 +9,9 @@
   <h1 id="status"></h1>
   <p id="orden"></p>
 
-  <script>
+  <script>      
     const urlParams = new URLSearchParams(window.location.search);
+    document.write(`<pre>${decodeURIComponent(window.location.search)}</pre>`);
     const status = urlParams.get('payment_status');
     const orderId = urlParams.get('orderId');
 
