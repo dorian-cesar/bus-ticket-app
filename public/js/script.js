@@ -321,6 +321,37 @@ function initPaymentButtons() {
     $(document).off('click', '#payWeb, #payCash').on('click', '#payWeb, #payCash', handlePayment);
 }
 
+function obtenerMensajeErrorFlow(codigo) {
+    switch (Number(codigo)) {
+        case -1:
+            return "❌ Tarjeta inválida";
+        case -2:
+            return "❌ Error de conexión con el medio de pago";
+        case -3:
+            return "❌ Excede el monto máximo permitido";
+        case -4:
+            return "❌ Fecha de expiración inválida";
+        case -5:
+            return "❌ Problema en la autenticación de la tarjeta";
+        case -6:
+            return "❌ Rechazo general de la transacción";
+        case -7:
+            return "❌ Tarjeta bloqueada";
+        case -8:
+            return "❌ Tarjeta vencida";
+        case -9:
+            return "❌ Transacción no soportada por el medio de pago";
+        case -10:
+            return "❌ Problema interno en la transacción";
+        case -11:
+            return "❌ Límite de reintentos de rechazos excedido";
+        case 999:
+            return "❌ Error desconocido en el proceso de pago";
+        default:
+            return "❌ Código de error no reconocido";
+    }
+}
+
 // Función principal de manejo de pagos
 async function handlePayment() {
 
@@ -364,10 +395,41 @@ async function handlePayment() {
 
             if (data.url) {
                 localStorage.setItem('lastOrderId', orderId);
+                localStorage.setItem('lastToken', data.flowData.token);
+
                 const paymentWindow = window.open(data.url, 'FlowPayment', 'width=500,height=700');
                 if (!paymentWindow) {
                     alert('Por favor, habilita los popups para este sitio');
+                    return;
                 }
+
+
+                const popupInterval = setInterval(async () => {
+                    if (paymentWindow.closed) {
+                        clearInterval(popupInterval);
+                        console.log("Popup cerrado. Consultando estado...");
+
+                        // Consultar estado al backend
+                        const token = localStorage.getItem('lastToken');
+
+                        const checkRes = await fetch('/.netlify/functions/consultarPago', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ token })
+                        });
+
+                        const checkData = await checkRes.json();
+                        console.log("Respuesta de flowCallback:", checkData);
+
+                        if (checkData.status === 1) {
+                            alert('✅ ¡Pago confirmado!');
+                            // Aquí puedes redirigir, actualizar UI, etc.
+                        } else {
+                            const codigoError = checkData?.paymentData?.errorCode ?? 999;
+                            alert(obtenerMensajeErrorFlow(codigoError));
+                        }
+                    }
+                }, 1000);
 
                 return;
             } else {
