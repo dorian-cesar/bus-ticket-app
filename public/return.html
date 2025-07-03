@@ -1,27 +1,81 @@
-<!-- return.html -->
 <!DOCTYPE html>
-<html lang="es">
+<html>
+
 <head>
-  <meta charset="UTF-8" />
-  <title>Resultado del Pago</title>
+  <title>Redirigiendo...</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+
+    .spinner {
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid #3498db;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
 </head>
+
 <body>
-  <h1 id="status"></h1>
-  <p id="orden"></p>
+  <div class="spinner"></div>
+  <h2>Procesando tu pago...</h2>
+  <p>Por favor no cierres esta ventana.</p>
 
-  <script>      
-    const urlParams = new URLSearchParams(window.location.search);
-    document.write(`<pre>${decodeURIComponent(window.location.search)}</pre>`);
-    const status = urlParams.get('payment_status');
-    const orderId = urlParams.get('orderId');
+  <script>
+    // Esperar a que todo esté cargado
+    document.addEventListener('DOMContentLoaded', function () {
+      // Obtener datos desde la URL
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get("token");
+      const status = params.get("status");
 
-    document.getElementById('status').textContent = status === 'success' 
-      ? '✅ ¡Pago exitoso!'
-      : '❌ Pago no completado';
+      // Si tenemos token, enviar mensaje al padre
+      if (token) {
+        try {
+          window.opener.postMessage({
+            tipo: 'pagoCompletado',
+            token: token,
+            status: status
+          }, '*');
 
-    document.getElementById('orden').textContent = orderId
-      ? 'Orden: ' + orderId
-      : 'Sin número de orden';
+          // Cerrar ventana después de 2 segundos
+          setTimeout(() => {
+            window.close();
+          }, 2000);
+        } catch (e) {
+          // Redirigir manualmente si falla postMessage
+          setTimeout(() => {
+            window.location.href = window.opener.location.href + '?payment_status=' + (status === '1' ? 'success' : 'failed');
+            window.close();
+          }, 2000);
+        }
+      } else {
+        // Si no hay token, mostrar mensaje de error
+        document.body.innerHTML = `
+          <h2 style="color: #d9534f;">Error en el pago</h2>
+          <p>No se recibió confirmación del pago.</p>
+          <button onclick="window.close()">Cerrar</button>
+        `;
+      }
+    });
   </script>
 </body>
+
 </html>
