@@ -64,6 +64,7 @@ export async function handler(event) {
     });
 
     const data = await response.json();
+    console.log("Respuesta de Flow:", data);
 
     if (!response.ok) {
       console.error("Error en respuesta de Flow:", data);
@@ -79,7 +80,7 @@ export async function handler(event) {
     return {
       statusCode: 200,
       body: JSON.stringify({
-        url: data.url,
+        url: `${data.url}?token=${data.token}`,
         flowData: data
       }),
       headers: { 'Content-Type': 'application/json' }

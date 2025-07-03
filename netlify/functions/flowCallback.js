@@ -5,6 +5,9 @@ const SECRET_KEY = process.env.FLOW_SECRET_KEY;
 const FLOW_URL = process.env.FLOW_URL;
 
 export async function handler(event) {
+  
+  console.log("⚡ Callback recibido. Método:", event.httpMethod);
+
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Método no permitido' };
   }
