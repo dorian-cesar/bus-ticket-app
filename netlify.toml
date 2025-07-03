@@ -1,3 +1,33 @@
 [build]
   publish = "public"
   functions = "netlify/functions"
+
+# Redirección para POST a return.html
+[[redirects]]
+  from = "/return.html"
+  to = "/.netlify/functions/serveReturn"
+  status = 200
+  force = true
+  conditions = {Method = ["POST"]}
+
+# Redirección para GET a return.html (archivo estático)
+[[redirects]]
+  from = "/return.html"
+  to = "/return.html"
+  status = 200
+  force = true
+  conditions = {Method = ["GET"]}
+
+# Redirección general para SPA
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Headers para CORS
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type, Authorization"

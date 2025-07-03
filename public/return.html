@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-  <title>Redirigiendo...</title>
+  <title>Procesando Pago</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -10,7 +9,6 @@
       padding: 20px;
       background-color: #f5f5f5;
     }
-
     .spinner {
       border: 5px solid #f3f3f3;
       border-top: 5px solid #3498db;
@@ -20,62 +18,57 @@
       animation: spin 1s linear infinite;
       margin: 20px auto;
     }
-
     @keyframes spin {
-      0% {
-        transform: rotate(0deg);
-      }
-
-      100% {
-        transform: rotate(360deg);
-      }
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
   </style>
 </head>
-
 <body>
   <div class="spinner"></div>
   <h2>Procesando tu pago...</h2>
   <p>Por favor no cierres esta ventana.</p>
 
   <script>
-    // Esperar a que todo esté cargado
-    document.addEventListener('DOMContentLoaded', function () {
-      // Obtener datos desde la URL
-      const params = new URLSearchParams(window.location.search);
-      const token = params.get("token");
-      const status = params.get("status");
+    // Obtener parámetros de la URL o del objeto inyectado
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token') || (window.flowParams && window.flowParams.token);
+    const status = urlParams.get('status') || (window.flowParams && window.flowParams.status) || '0';
 
-      // Si tenemos token, enviar mensaje al padre
-      if (token) {
-        try {
+    console.log('Token recibido:', token);
+    console.log('Status recibido:', status);
+
+    function sendMessageAndClose() {
+      try {
+        if (window.opener && !window.opener.closed) {
           window.opener.postMessage({
             tipo: 'pagoCompletado',
             token: token,
             status: status
           }, '*');
-
-          // Cerrar ventana después de 2 segundos
-          setTimeout(() => {
-            window.close();
-          }, 2000);
-        } catch (e) {
-          // Redirigir manualmente si falla postMessage
-          setTimeout(() => {
-            window.location.href = window.opener.location.href + '?payment_status=' + (status === '1' ? 'success' : 'failed');
-            window.close();
-          }, 2000);
+          
+          console.log('Mensaje enviado al opener');
+        } else {
+          console.warn('No hay opener o está cerrado');
         }
-      } else {
-        // Si no hay token, mostrar mensaje de error
-        document.body.innerHTML = `
-          <h2 style="color: #d9534f;">Error en el pago</h2>
-          <p>No se recibió confirmación del pago.</p>
-          <button onclick="window.close()">Cerrar</button>
-        `;
+      } catch (e) {
+        console.error('Error enviando mensaje:', e);
+      } finally {
+        setTimeout(() => {
+          window.close();
+        }, 2000);
       }
-    });
+    }
+
+    if (token) {
+      sendMessageAndClose();
+    } else {
+      document.body.innerHTML = `
+        <h2 style="color: #d9534f;">Error en el pago</h2>
+        <p>No se recibió confirmación del pago.</p>
+        <button onclick="window.close()">Cerrar</button>
+      `;
+    }
   </script>
 </body>
-
 </html>
