@@ -10,7 +10,7 @@ const USER = process.env.USER;
 exports.handler = async function(event, context) {
   try {
 
-    const token = jwt.sign({ username: USER }, SECRET_KEY, { expiresIn: "15m" });
+    const token = jwt.sign({ username: USER }, SECRET_KEY, { expiresIn: "10m" });
 
     return {
       statusCode: 200,

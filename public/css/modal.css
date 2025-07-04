@@ -1,123 +1,194 @@
 /* Estilos para modales */
 .modal {
-    display: none;
-    position: fixed;
-    z-index: 1050;
-    left: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    overflow-x: hidden;
-    overflow-y: auto;
-    align-items: center;
-    justify-content: center;
+  display: none;
+  position: fixed;
+  z-index: 1050;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  overflow-x: hidden;
+  overflow-y: auto;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal.show {
+  display: flex;
+}
+
+.modal-dialog {
+  background: white;
+  border-radius: 0.3rem;
+  max-width: 500px;
+  width: 90%;
+  margin: auto;
+  box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
+  animation: fadeInScale 0.3s ease forwards;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
   }
-  
-  .modal.show {
-    display: flex;
-  }
-  
-  .modal-dialog {
-    background: white;
-    border-radius: 0.3rem;
-    max-width: 500px;
-    width: 90%;
-    margin: auto;
-    box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
-    animation: fadeInScale 0.3s ease forwards;
-  }
-  
-  @keyframes fadeInScale {
-    from {
-      opacity: 0;
-      transform: scale(0.9);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-  
-  .modal-header {
-    padding: 1rem;
-    border-bottom: 1px solid #dee2e6;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .btn-close {
-    background: transparent;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    line-height: 1;
-    color: #000;
-    opacity: 0.5;
-  }
-  
-  .btn-close:hover {
+
+  to {
     opacity: 1;
+    transform: scale(1);
   }
-  
-  .modal-body {
-    padding: 1rem;
-    text-align: center;
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    flex-direction: column;
-  }
-  
-  .btn-primary {
-    background-color: #f37b31;
-    color: white;
-  }
-  
-  .btn-success {
-    background-color: #28a745;
-    color: white;
-  }
-  
-  .btn-secondary {
-    background-color: #6c757d;
-    color: white;
-  }
-  
-  .btn {
-    padding: 10px 20px;
-    border-radius: 50px;
-    border: none;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-  
-  .btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  }
-  
-  .modal.show .modal-dialog {
-    transform: translateY(0);
-  }
-  
-  .payment-success, .payment-error {
-    padding: 20px;
-    text-align: center;
-  }
-  
-  .payment-success h4 {
-    color: #28a745;
-  }
-  
-  .payment-error h4 {
-    color: #dc3545;
-  }
-  
-  .loading-payment {
-    padding: 30px;
-    text-align: center;
-    font-size: 1.2rem;
-  }
+}
+
+.modal-header {
+  padding: 1rem;
+  border-bottom: 1px solid #dee2e6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-close {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  line-height: 1;
+  color: #000;
+  opacity: 0.5;
+}
+
+.btn-close:hover {
+  opacity: 1;
+}
+
+.modal-body {
+  padding: 1rem;
+  text-align: center;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.btn-primary {
+  background-color: #f37b31;
+  color: white;
+}
+
+.btn-success {
+  background-color: #28a745;
+  color: white;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+.btn {
+  padding: 10px 20px;
+  border-radius: 50px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.modal.show .modal-dialog {
+  transform: translateY(0);
+}
+
+.payment-success,
+.payment-error {
+  padding: 20px;
+  text-align: center;
+}
+
+/* En tu archivo modal.css */
+.payment-success,
+.payment-error {
+  text-align: center;
+  padding: 20px;
+}
+
+.payment-success i {
+  color: #28a745;
+  font-size: 3rem;
+  margin-bottom: 15px;
+}
+
+.payment-error i {
+  color: #dc3545;
+  font-size: 3rem;
+  margin-bottom: 15px;
+}
+
+.payment-success h3 {
+  color: #28a745;
+  margin-bottom: 10px;
+}
+
+.payment-error h3 {
+  color: #dc3545;
+  margin-bottom: 10px;
+}
+
+.btn-close-modal {
+  margin-top: 20px;
+  padding: 8px 20px;
+}
+
+.loading-payment {
+  padding: 30px;
+  text-align: center;
+  font-size: 1.2rem;
+}
+
+/* Agregar al archivo modal.css */
+.payment-loading {
+  text-align: center;
+  padding: 20px;
+}
+
+.payment-loading .spinner {
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #3498db;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-actions {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.warning-icon {
+  color: #ffc107;
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.payment-warning {
+  text-align: center;
+  padding: 20px;
+  color: #856404;
+  background-color: #fff3cd;
+  border-radius: 5px;
+  border-left: 4px solid #ffc107;
+}
