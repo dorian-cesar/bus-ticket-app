@@ -40,7 +40,7 @@ export async function handler(event) {
     const params = {
       apiKey: API_KEY,
       commerceOrder: orderId,
-      amount: amount.toString(),
+      amount: "350",
       currency: "CLP",
       urlReturn: `${urlBase}/.netlify/functions/serveReturn`,
       urlConfirmation: `${urlBase}/.netlify/functions/flowCallback`,
