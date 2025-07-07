@@ -9,7 +9,7 @@ function isTokenExpired(token) {
     }
 }
 
-function logout() {
+async function logout() {
     localStorage.removeItem('tokenSesion');
     window.location.href = '/index.html';
 }
@@ -769,6 +769,10 @@ window.addEventListener('DOMContentLoaded', () => {
           <button class="btn btn-primary btn-close-modal">Aceptar</button>
         </div>
       `).fadeIn();
+    }
+    const logoutButton = document.getElementById('logoutBtn');
+    if (logoutButton) {
+        logoutButton.addEventListener('click', logout);
     }
 });
 

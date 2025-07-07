@@ -94,7 +94,7 @@
             },
             body: JSON.stringify({
               seatNumber: s.seat,
-              authCode: 'FLOW_OK',
+              authCode: 'AUTHWEB123',
               userId: 'usuario123'
             })
           });
@@ -124,7 +124,7 @@
         }, '*');
       }
 
-      setTimeout(() => window.close(), 3000);
+      setTimeout(() => window.close(), 2000);
 
       document.body.innerHTML = `
     <div class="payment-success">
@@ -145,7 +145,7 @@
         }, '*');
       }
 
-      setTimeout(() => window.close(), 3000);
+      setTimeout(() => window.close(), 2000);
 
       document.body.innerHTML = `
     <div class="payment-error">

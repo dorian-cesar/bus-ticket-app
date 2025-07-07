@@ -1,10 +1,11 @@
 /* Estilos base */
-body, html {
+body,
+html {
   margin: 0;
   padding: 0;
   font-family: Arial, sans-serif !important;
   background-image: url('../img/fondo3.jpg');
-  background-size: cover;     
+  background-size: cover;
   background-repeat: no-repeat;
   height: 100%;
   overflow: hidden;
@@ -17,7 +18,7 @@ body, html {
   flex-direction: row;
   flex-wrap: wrap;
   height: calc(100vh - 80px);
-} 
+}
 
 .nav-tickets {
   width: 100%;
@@ -29,8 +30,16 @@ body, html {
   font-size: 2rem;
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  padding: 0 30px 0 30px;
+}
+.nav-item{
+  flex: 1;
+  display: flex;
+  align-items: center;
   justify-content: center;
 }
+
 
 .nav-tickets h2 {
   margin: 0;
@@ -85,12 +94,35 @@ body, html {
   color: #fff;
 }
 
+.logout-btn {
+  background: none;
+  border: none;
+  color: var(--gray);
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.2s;
+}
+
+.logout-btn:hover {
+  color: var(--primary);
+}
+
+.logout-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
 .seccion2 {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  overflow-y: auto; /* <--- Esto es lo importante */
-  max-height: calc(100vh - 80px); /* Ajusta este valor según el alto de tu header */
+  overflow-y: auto;
+  /* <--- Esto es lo importante */
+  max-height: calc(100vh - 80px);
+  /* Ajusta este valor según el alto de tu header */
   opacity: 1;
   transform: translateY(0);
 }
@@ -109,15 +141,20 @@ body, html {
 }
 
 @media (max-width: 1500px) {
-  html, body{
+
+  html,
+  body {
     overflow-y: auto;
   }
 }
 
 @media (max-width: 1000px) {
-  html, body{
+
+  html,
+  body {
     overflow-y: auto;
   }
+
   .contenedor {
     flex-direction: column;
     height: auto;
@@ -126,6 +163,10 @@ body, html {
   .seccion {
     flex: none;
     width: 100%;
+    height: auto;
+  }
+  .nav-tickets{
+    min-height: 80px;
     height: auto;
   }
 }
