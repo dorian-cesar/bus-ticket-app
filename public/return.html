@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Procesando Pago</title>
   <style>
@@ -21,8 +22,13 @@
     }
 
     @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
     }
 
     .btn {
@@ -39,11 +45,13 @@
       background: #aaa;
     }
 
-    .payment-success, .payment-error {
+    .payment-success,
+    .payment-error {
       margin-top: 30px;
     }
   </style>
 </head>
+
 <body>
   <div class="spinner"></div>
   <h2>Procesando tu pago...</h2>
@@ -108,27 +116,49 @@
     }
 
     function mostrarExito(orderId) {
+      if (window.opener && !window.opener.closed) {
+        window.opener.postMessage({
+          tipo: 'pagoCompletado',
+          token: tokenFromServer,
+          status: paymentStatusFromServer || '1'
+        }, '*');
+      }
+
+      setTimeout(() => window.close(), 3000);
+
       document.body.innerHTML = `
-        <div class="payment-success">
-          <h2>¡Pago exitoso!</h2>
-          <p>Orden <strong>${orderId}</strong> confirmada.</p>
-          <p>Recibirás un correo con los detalles.</p>
-          <a href="/" class="btn">Volver al inicio</a>
-        </div>
-      `;
+    <div class="payment-success">
+      <h2>¡Pago exitoso!</h2>
+      <p>Orden <strong>${orderId}</strong> confirmada.</p>
+      <p>Recibirás un correo con los detalles.</p>
+      <a href="/" class="btn">Volver al inicio</a>
+    </div>
+  `;
     }
 
     function mostrarError(msg) {
+      if (window.opener && !window.opener.closed) {
+        window.opener.postMessage({
+          tipo: 'pagoCompletado',
+          token: tokenFromServer || '',
+          status: paymentStatusFromServer || '0'
+        }, '*');
+      }
+
+      setTimeout(() => window.close(), 3000);
+
       document.body.innerHTML = `
-        <div class="payment-error">
-          <h2>❌ Error en el pago</h2>
-          <p>${msg}</p>
-          <a href="/" class="btn btn-secondary">Volver</a>
-        </div>
-      `;
+    <div class="payment-error">
+      <h2>❌ Error en el pago</h2>
+      <p>${msg}</p>
+      <a href="/" class="btn btn-secondary">Volver</a>
+    </div>
+  `;
     }
+
 
     window.addEventListener('DOMContentLoaded', main);
   </script>
 </body>
+
 </html>

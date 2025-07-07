@@ -2,240 +2,287 @@
 <html lang="es">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="css/styles.css">
-  <link rel="stylesheet" href="css/forms.css">
-  <link rel="stylesheet" href="css/services.css">
-  <link rel="stylesheet" href="css/seats.css">
-  <link rel="stylesheet" href="css/summary.css">
-  <link rel="stylesheet" href="css/modal.css">
-  <link rel="stylesheet" href="css/animations.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-  <title>Venta de Boletos - Buses</title>
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión | Sistema</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --error: #ef233c;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --border: #dee2e6;
+        }
 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f7ff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 420px;
+            padding: 40px;
+            margin: 20px;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo svg {
+            width: 48px;
+            height: 48px;
+            color: var(--primary);
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-top: 16px;
+            color: var(--dark);
+        }
+
+        h2 {
+            font-size: 20px;
+            font-weight: 500;
+            margin-bottom: 24px;
+            text-align: center;
+            color: var(--dark);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        .password-toggle {
+            border: none;
+            cursor: pointer;
+            color: var(--gray);
+            padding: 4px;
+        }
+
+        .password-toggle:hover {
+            color: var(--primary);
+        }
+
+        .password-toggle svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .password-content {
+            display: flex;
+            align-items: center;
+        }
+        
+        .password-content button {
+            justify-content: center;
+            margin: 0 0 0 10px;
+            width: 40px;
+            display: flex;
+            align-items: center;
+            height: 100%;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .error-message {
+            color: var(--error);
+            font-size: 14px;
+            margin-top: 16px;
+            text-align: center;
+            min-height: 20px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 13px;
+            color: var(--gray);
+        }
+
+        .footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 30px 20px;
+            }
+        }
+    </style>
 </head>
 
 <body>
-  <div class="nav-tickets">
-    <h2>Venta de Boletos</h2>
-  </div>
-  <div class="contenedor">
+    <div class="login-container">
+        <div class="logo">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4" />
+            </svg>
+            <h1>Sistema</h1>
+        </div>
 
-    <section class="seccion seccion1">
-      <div class="form-container">
-        <form id="searchForm" class="formulario">
-          <div class="form-header">
-            <h3 class="title-form">¡Planifica tu viaje!</h3>
-            <p class="subtitle-form">Selecciona tus datos de viaje</p>
-          </div>
+        <h2>Iniciar Sesión</h2>
 
-          <div class="input-group">
-            <div class="input-formulario">
-              <label for="origin" class="form-label">
-                <i class="fas fa-map-marker-alt"></i> Ciudad de Origen
-              </label>
-              <select id="origin" class="form-select" required>
-                <option value="" disabled selected>Selecciona tu origen</option>
-              </select>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">Usuario</label>
+                <input type="text" id="username" placeholder="Ingresa tu usuario" required />
             </div>
 
-            <div class="input-formulario">
-              <label for="destination" class="form-label">
-                <i class="fas fa-map-marker-alt"></i> Ciudad de Destino
-              </label>
-              <select id="destination" class="form-select" required>
-                <option value="" disabled selected>Selecciona tu destino</option>
-              </select>
+            <div class="form-group">
+                <label for="password">Contraseña</label>
+                <div class="password-content">
+                    <input type="password" id="password" placeholder="Ingresa tu contraseña" required />
+                    <button type="button" class="password-toggle" id="togglePassword">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                    </button>
+                </div>
             </div>
+            <button type="submit">Ingresar</button>
 
-            <div class="input-formulario">
-              <label for="date" class="form-label">
-                <i class="fas fa-calendar-alt"></i> Fecha del Viaje
-              </label>
-              <input type="date" id="date" class="form-control" required>
-            </div>
-          </div>
-
-          <div class="btn-formulario">
-            <button type="submit" class="btn btn-submit">
-              <i class="fas fa-search"></i> Buscar Servicios
-            </button>
-          </div>
+            <div id="error" class="error-message"></div>
         </form>
-      </div>
 
-      <div class="servicios">
-        <div class="servicios-header">
-          <h3>Servicios disponibles</h3>
-          <p id="search-results-text" class="results-text"></p>
+        <div class="footer">
+            ¿Olvidaste tu contraseña? <a href="#">Recuperar</a>
         </div>
-        <ul id="serviceList" class="list-group"></ul>
-      </div>
-    </section>
-
-
-    <section class="seccion seccion2">
-
-      <div class="contenedor-contenido-seccio2">
-
-
-        <div class="header-seccion2">
-          <h3>Distribución de Asientos</h3>
-        </div>
-        <div class="contenido-seccion">
-          <div class="distribucion">
-            <div id="seatLayout" class="contenedor-asientos"></div>
-          </div>
-
-          <div class="listas">
-            <div class="colores">
-              <ul class="lista-colores">
-                <li class="contenedor-color">
-                  <div class="color color-1"></div>
-                  <div class="nombre-color">
-                    <p>Disponible</p>
-                  </div>
-                </li>
-                <li class="contenedor-color">
-                  <div class="color color-2"></div>
-                  <div class="nombre-color">
-                    <p>Seleccionado</p>
-                  </div>
-                </li>
-                <li class="contenedor-color">
-                  <div class="color color-3"></div>
-                  <div class="nombre-color">
-                    <p>Reservado</p>
-                  </div>
-                </li>
-                <li class="contenedor-color">
-                  <div class="color color-4"></div>
-                  <div class="nombre-color">
-                    <p>Bloqueado</p>
-                  </div>
-                </li>
-              </ul>
-            </div>
-            <div class="pasajes">
-              <div id="ticketDetails" class="contenedor-pasajes"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-
-    </section>
-
-
-    <section class="seccion seccion3">
-      <div class="resumen">
-        <h2>Resumen de tu viaje</h2>
-
-        <!-- Sección de Recorrido -->
-        <div class="action-buttons">
-        </div><button class="btn btn-primary btn-pagar" id="openPaymentModal">Pagar</button>
-
-        <div class="info-section price-section">
-          <div class="price-detail">
-            <span class="label">Total a pagar:</span>
-            <span id="total-price" class="price">$0</span>
-          </div>
-        </div>
-        <div class="info-section">
-          <h3 class="section-title">Recorrido</h3>
-          <div class="route-info">
-            <div class="location">
-              <span class="label">Desde</span>
-              <span id="origen" class="city"></span>
-            </div>
-            <div class="route-arrow"><i class="fa-solid fa-arrow-right"></i></div>
-            <div class="location">
-              <span class="label">Hacia</span>
-              <span id="destino" class="city"></span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Sección de Horario -->
-        <div class="info-section">
-          <div class="date-header">
-            <h3 class="section-title">Horario</h3>
-            <span id="fecha" class="travel-date"></span>
-          </div>
-
-
-          <div class="time-info">
-            <div class="time-group">
-              <span class="label">Salida</span>
-              <span id="hora-ida" class="time"></span>
-            </div>
-            <div class="time-arrow"><i class="fa-solid fa-clock"></i></div>
-            <div class="time-group">
-              <span class="label">Llegada aprox.</span>
-              <span id="hora-llegada" class="time"></span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Sección de Asientos -->
-        <div class="info-section">
-          <h3 class="section-title">Asientos seleccionados</h3>
-          <div id="selected-seats" class="seats-container">
-
-          </div>
-        </div>
-
-        <!-- Sección del Bus -->
-        <div class="info-section">
-          <h3 class="section-title">Información del Bus</h3>
-          <div class="bus-info">
-            <div class="bus-detail">
-              <span class="label">Patente:</span>
-              <span id="bus-plate" class="detail"></span>
-            </div>
-            <div class="bus-detail">
-              <span class="label">Tipo:</span>
-              <span id="bus-type" class="detail"></span>
-            </div>
-            <div class="bus-detail">
-              <span class="label">Empresa:</span>
-              <span id="bus-company" class="detail"></span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Sección de Precio -->
-
-
-      </div>
-    </section>
-
-
-
-
-    <!-- Modal de Pago -->
-    <div class="modal" id="paymentModal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Seleccionar Método de Pago</h5>
-            <button type="button" class="btn-close" aria-label="Cerrar modal"></button>
-          </div>
-          <div class="modal-body">
-            <button id="payWeb" class="btn btn-primary">Pago Web</button>
-            <button id="payCash" class="btn btn-success">Pago en Efectivo</button>
-            <button class="btn btn-secondary btn-close-modal">Cancelar</button>
-          </div>
-        </div>
-      </div>
     </div>
 
+    <script>
+        // Toggle para mostrar/ocultar contraseña
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
 
-    <script type="module" src="js/script.js"></script>
+        togglePassword.addEventListener('click', function () {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
 
+            // Cambiar el icono
+            this.innerHTML = type === 'password' ?
+                `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+        </svg>` :
+                `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+        </svg>`;
+        });
 
+        // Manejo del formulario
+        document.getElementById('loginForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorElement = document.getElementById('error');
+
+            // Mostrar estado de carga
+            const submitButton = e.target.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton.textContent;
+            submitButton.textContent = 'Ingresando...';
+            submitButton.disabled = true;
+            errorElement.textContent = '';
+
+            try {
+                const res = await fetch('/.netlify/functions/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password }),
+                });
+
+                const data = await res.json();
+                if (res.ok) {
+                    localStorage.setItem('tokenSesion', data.token);
+                    window.location.href = '/app.html';
+                } else {
+                    errorElement.textContent = data.error || 'Credenciales incorrectas. Por favor intenta nuevamente.';
+                }
+            } catch (error) {
+                errorElement.textContent = 'Error de conexión. Por favor intenta más tarde.';
+            } finally {
+                submitButton.textContent = originalButtonText;
+                submitButton.disabled = false;
+            }
+        });
+    </script>
 </body>
 
 </html>

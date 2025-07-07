@@ -13,8 +13,29 @@ export async function handler(event, context) {
 
       const scriptInjection = `
         <script>
-          const tokenFromServer = "${token}";
-          const paymentStatusFromServer = "${status}";
+          document.addEventListener('DOMContentLoaded', function() {
+            const token = "${token || ''}";
+            const status = "${status || '0'}";
+            
+            console.log('Token recibido:', token);
+            console.log('Status recibido:', status);
+            
+            if (token) {
+              try {
+                if (window.opener && !window.opener.closed) {
+                  window.opener.postMessage({
+                    tipo: 'pagoCompletado',
+                    token: token,
+                    status: status
+                  }, '*');
+                  
+                  setTimeout(() => window.close(), 5000);
+                }
+              } catch (e) {
+                console.error('Error en postMessage:', e);
+              }
+            }
+          });
         </script>
       `;
 

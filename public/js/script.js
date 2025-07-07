@@ -1,3 +1,25 @@
+function isTokenExpired(token) {
+    if (!token) return true;
+    try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const now = Math.floor(Date.now() / 1000);
+        return payload.exp < now;
+    } catch (e) {
+        return true;
+    }
+}
+
+function logout() {
+    localStorage.removeItem('tokenSesion');
+    window.location.href = '/index.html';
+}
+
+const loginToken = localStorage.getItem('tokenSesion');
+
+if (isTokenExpired(loginToken)) {
+    localStorage.removeItem('tokenSesion');
+    window.location.href = '/index.html';
+}
 
 
 console.log("script cargado");
