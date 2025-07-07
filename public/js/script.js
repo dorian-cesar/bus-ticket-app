@@ -30,7 +30,7 @@ let currentServiceId = '';
 let selectedSeats = [];
 let currentServiceData = null;
 
-let urlBase = window.location.origin; // esto lo resuelve automáticamente
+let urlBase = window.location.origin;
 
 
 async function obtenerToken() {
@@ -78,7 +78,7 @@ $('#searchForm').on('submit', function (e) {
         $('#serviceList').empty();
 
         const now = new Date();
-        const todayString = now.toISOString().split('T')[0]; // formato yyyy-mm-dd
+        const todayString = now.toISOString().split('T')[0];
 
         const serviciosValidos = data.filter(service => {
             // Si la fecha no es hoy, se muestra el servicio sin importar la hora
@@ -721,8 +721,12 @@ async function cancelPayment() {
 
 $(document).on('click', '.btn-confirm-cash', async function () {
     const $modal = $('#paymentModal');
+    const amount = getTotalPrice();
+    const orderId = generarIdUnico();
 
     let processed = 0;
+
+    // Confirmar los asientos primero
     selectedSeats.forEach(s => {
         $.ajax({
             url: `https://boletos.dev-wit.com/api/seats/${currentServiceId}/confirm`,
@@ -740,9 +744,32 @@ $(document).on('click', '.btn-confirm-cash', async function () {
                 $(`[data-seat="${s.seat}"]`).removeClass('selected').addClass('reserved').off('click');
                 processed++;
 
+                // Solo cuando se confirmen todos los asientos
                 if (processed === selectedSeats.length) {
-                    showPaymentResult($modal, true);
-                    localStorage.removeItem('pendingPayment');
+                    // Ahora registrar el pago en la función Netlify
+                    fetch('/.netlify/functions/registrarPago', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            servicioId: currentServiceId,
+                            usuario: 'usuario123',
+                            fecha: new Date().toISOString(),
+                            metodoPago: 'efectivo',
+                            monto: amount,
+                            orden: orderId,
+                            asientos: selectedSeats
+                        })
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            console.log('Pago registrado:', data);
+                            showPaymentResult($modal, true);
+                            localStorage.removeItem('pendingPayment');
+                        })
+                        .catch(err => {
+                            console.error('Error al registrar el pago:', err);
+                            showPaymentResult($modal, false);
+                        });
                 }
             },
             error: () => {
@@ -754,6 +781,7 @@ $(document).on('click', '.btn-confirm-cash', async function () {
         });
     });
 });
+
 
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -790,7 +818,6 @@ function showPaymentResult($modal, isSuccess) {
             </div>
         `);
 
-        // Resetear la interfaz después de pago exitoso
         resetTravelSummary();
     } else {
         $modal.find('.modal-body').html(`
@@ -813,21 +840,18 @@ function resetTravelSummary() {
     $('#selected-seats').empty();
     $('#total-price').text('$0');
 
-    // Resetear los asientos visualmente (cambiar reserved a available si es necesario)
     $('.seat.selected').removeClass('selected').addClass('reserved').off('click');
     $('.seccion2').removeClass('active')
 
-    // Mantener la información del viaje (origen, destino, fecha) pero limpiar detalles específicos
     $('#origen').text('-----');
     $('#destino').text('-----');
-    $('#fecha').text('----/--/--');
+    $('#fecha').text('');
     $('#hora-ida').text('--:--');
     $('#hora-llegada').text('--:--');
     $('#bus-plate').text('No disponible');
     $('#bus-type').text('No disponible');
     $('#bus-company').text('No disponible');
 
-    // Opcional: Si quieres limpiar completamente el formulario de búsqueda
     $('#searchForm')[0].reset();
     $('#serviceList').empty();
     $('.contenido-seccion').removeClass('active');
