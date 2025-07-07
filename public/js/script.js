@@ -835,4 +835,22 @@ function resetTravelSummary() {
 // Inicializar los botones de pago al cargar la página
 initPaymentButtons();
 
+setInterval(() => {
+    const token = localStorage.getItem('tokenSesion');
 
+    if (!token || isTokenExpired(token)) {
+        alert('Tu sesión ha expirado. Por favor vuelve a iniciar sesión.');
+        localStorage.removeItem('tokenSesion');
+        window.location.href = '/index.html';
+    }
+}, 30000); // cada 30 segundos
+
+
+
+window.addEventListener('pageshow', () => {
+    const token = localStorage.getItem('tokenSesion');
+    if (!token || isTokenExpired(token)) {
+        localStorage.removeItem('tokenSesion');
+        window.location.href = '/index.html';
+    }
+});
