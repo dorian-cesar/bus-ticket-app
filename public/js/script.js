@@ -10,23 +10,29 @@ function isTokenExpired(token) {
 }
 
 async function logout() {
+    localStorage.removeItem('idCaja');
     localStorage.removeItem('tokenSesion');
     localStorage.removeItem('user');
     window.location.href = '/index.html';
 }
 
 const loginToken = localStorage.getItem('tokenSesion');
+const user = JSON.parse(localStorage.getItem('user'));
+const idCaja = localStorage.getItem('idCaja');
 
 if (isTokenExpired(loginToken)) {
+    localStorage.removeItem('idCaja');
     localStorage.removeItem('tokenSesion');
     localStorage.removeItem('user');
     window.location.href = '/index.html';
 } else {
-    const user = JSON.parse(localStorage.getItem('user'));
     if (user) {
-        console.log("nombre: ",user.name);
-        console.log("correo: ",user.email);
-        console.log("rol: ", user.role);
+        console.log("nombre: ", user.name);
+        console.log("correo: ", user.email);
+    }
+
+    if (idCaja) {
+        console.log("caja: ", idCaja);
     }
 }
 
@@ -762,13 +768,14 @@ $(document).on('click', '.btn-confirm-cash', async function () {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
+                            orden: orderId,
+                            caja: idCaja,
+                            usuario: user.name,
                             servicioId: currentServiceId,
-                            usuario: 'usuario123',
                             fecha: new Date().toISOString(),
                             metodoPago: 'efectivo',
                             monto: amount,
-                            orden: orderId,
-                            asientos: selectedSeats
+                            asientos: selectedSeats,
                         })
                     })
                         .then(res => res.json())
@@ -798,13 +805,13 @@ $(document).on('click', '.btn-confirm-cash', async function () {
 window.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const paymentStatus = urlParams.get('payment_status');
-    const orderId = urlParams.get('orderId');
+    const orderIde = urlParams.get('orderId');
 
-    if (paymentStatus === 'success' && orderId) {
+    if (paymentStatus === 'success' && orderIde) {
         $('#paymentModal').html(`
         <div class="payment-success">
           <h4>¡Pago exitoso!</h4>
-          <p>Orden #${orderId} confirmada. Recibirás un email con los detalles.</p>
+          <p>Orden #${orderIde} confirmada. Recibirás un email con los detalles.</p>
           <button class="btn btn-primary btn-close-modal">Aceptar</button>
         </div>
       `).fadeIn();
@@ -871,20 +878,22 @@ function resetTravelSummary() {
 initPaymentButtons();
 
 setInterval(() => {
-    const token = localStorage.getItem('tokenSesion');
+    const tokenSesion = localStorage.getItem('tokenSesion');
 
-    if (!token || isTokenExpired(token)) {
+    if (!tokenSesion || isTokenExpired(tokenSesion)) {
         alert('Tu sesión ha expirado. Por favor vuelve a iniciar sesión.');
+        localStorage.removeItem('idCaja');
         localStorage.removeItem('tokenSesion');
+        localStorage.removeItem('user');
         window.location.href = '/index.html';
     }
-}, 30000); // cada 30 segundos
+}, 20000); // cada 20 segundos
 
 
 
 window.addEventListener('pageshow', () => {
     const token = localStorage.getItem('tokenSesion');
-    if (!token || isTokenExpired(token)) {
+    if (!token || isTokenExpired(token) && !idCaja) {
         localStorage.removeItem('tokenSesion');
         window.location.href = '/index.html';
     }

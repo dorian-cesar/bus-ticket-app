@@ -242,7 +242,8 @@
         });
 
         const token = localStorage.getItem('tokenSesion');
-        if (token && !isTokenExpired(token)) {
+        const caja = localStorage.getItem('idCaja');
+        if (token && !isTokenExpired(token) || caja) {
             window.location.href = '/app.html';
         }
 
@@ -271,6 +272,11 @@
             submitButton.disabled = true;
             errorElement.textContent = '';
 
+            function generarIdCaja() {
+                return 'caja_' + Date.now();
+            }
+
+
             try {
                 const res = await fetch('https://boletos.dev-wit.com/api/users/login', {
                     method: 'POST',
@@ -283,8 +289,10 @@
                 const data = await res.json();
                 if (res.ok) {
                     console.log(data);
+                    const idCaja = generarIdCaja();
                     localStorage.setItem('tokenSesion', data.token);
                     localStorage.setItem('user', JSON.stringify(data.user));
+                    localStorage.setItem('idCaja', idCaja);
                     window.location.href = '/app.html';
                 } else {
                     errorElement.textContent = data.error || 'Credenciales incorrectas. Por favor intenta nuevamente.';
