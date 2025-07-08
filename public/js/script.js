@@ -151,6 +151,8 @@ $(document).on('click', '.selectServiceBtn', function () {
     $.get(`https://boletos.dev-wit.com/api/services?origin=${$('#origin').val()}&destination=${$('#destination').val()}&date=${$('#date').val()}`, function (data) {
         currentServiceData = data.find(s => s.id === serviceId);
 
+        console.log("currentServiceData:", currentServiceData);
+
         updateTravelSummary(
             $('#origin option:selected').text(),
             $('#destination option:selected').text(),
@@ -183,7 +185,10 @@ $(document).on('click', '.selectServiceBtn', function () {
                     $('#seatLayout').append(rowDiv);
                 });
             };
-            const layout = currentServiceData.layout;
+            const layout = currentServiceData.seatLayout;
+
+            console.log("Service layout:", layout);
+
 
             if (layout) {
                 if (layout.floor1) renderSeats('Primer Piso', layout.floor1.seatMap, 1);
