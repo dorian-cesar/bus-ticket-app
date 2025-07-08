@@ -1,11 +1,11 @@
-let pagosSimulados = [];
+let pagoTotal = [];
 
 exports.handler = async (event) => {
   if (event.httpMethod === 'POST') {
     try {
       const pago = JSON.parse(event.body);
 
-      pagosSimulados.push(pago);
+      pagoTotal.push(pago);
 
       return {
         statusCode: 200,
@@ -22,7 +22,7 @@ exports.handler = async (event) => {
   if (event.httpMethod === 'GET') {
     return {
       statusCode: 200,
-      body: JSON.stringify({ pagos: pagosSimulados }),
+      body: JSON.stringify({ pagos: pagoTotal }),
     };
   }
 

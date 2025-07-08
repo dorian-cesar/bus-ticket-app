@@ -11,6 +11,7 @@ function isTokenExpired(token) {
 
 async function logout() {
     localStorage.removeItem('tokenSesion');
+    localStorage.removeItem('user');
     window.location.href = '/index.html';
 }
 
@@ -18,11 +19,16 @@ const loginToken = localStorage.getItem('tokenSesion');
 
 if (isTokenExpired(loginToken)) {
     localStorage.removeItem('tokenSesion');
+    localStorage.removeItem('user');
     window.location.href = '/index.html';
+} else {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user) {
+        console.log("nombre: ",user.name);
+        console.log("correo: ",user.email);
+        console.log("rol: ", user.role);
+    }
 }
-
-
-console.log("script cargado");
 
 let jwtToken = null;
 
@@ -751,7 +757,7 @@ $(document).on('click', '.btn-confirm-cash', async function () {
 
                 // Solo cuando se confirmen todos los asientos
                 if (processed === selectedSeats.length) {
-                    // Ahora registrar el pago en la función Netlify
+
                     fetch('/.netlify/functions/registrarPago', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },

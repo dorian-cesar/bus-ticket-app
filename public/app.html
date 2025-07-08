@@ -21,6 +21,7 @@
   <div class="nav-tickets">
     <h2 class="nav-item">Venta de Boletos</h2>
     <div class="nav-item nav-btn">
+      <span id="userName" class="usuario">Usuario</span>
       <button class="logout-btn" id="logoutBtn">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -248,7 +249,15 @@
         const dateInput = document.getElementById('date');
         const today = new Date().toISOString().split('T')[0]; // "YYYY-MM-DD"
         dateInput.min = today;
+
+        const user = JSON.parse(localStorage.getItem('user'));
+
+        if (user && user.name) {
+          document.getElementById('userName').textContent = user.name || 'Usuario';
+        }
       });
+
+
     </script>
 
 

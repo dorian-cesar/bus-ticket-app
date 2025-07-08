@@ -284,6 +284,7 @@
                 if (res.ok) {
                     console.log(data);
                     localStorage.setItem('tokenSesion', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
                     window.location.href = '/app.html';
                 } else {
                     errorElement.textContent = data.error || 'Credenciales incorrectas. Por favor intenta nuevamente.';
