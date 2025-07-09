@@ -4,13 +4,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="css/styles.css">
-  <link rel="stylesheet" href="css/forms.css">
-  <link rel="stylesheet" href="css/services.css">
-  <link rel="stylesheet" href="css/seats.css">
-  <link rel="stylesheet" href="css/summary.css">
-  <link rel="stylesheet" href="css/modal.css">
-  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/forms.css">
+  <link rel="stylesheet" href="../css/services.css">
+  <link rel="stylesheet" href="../css/seats.css">
+  <link rel="stylesheet" href="../css/summary.css">
+  <link rel="stylesheet" href="../css/modal.css">
+  <link rel="stylesheet" href="../css/animations.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
   <title>Venta de Boletos - Buses</title>
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -27,7 +27,7 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
         </svg>
-        Cerrar sesión
+        Atrás
       </button>
     </div>
 
@@ -140,7 +140,7 @@
     </section>
 
 
-    <section class="seccion seccion3">
+    <section class="seccion seccion3 active">
       <div class="resumen">
         <h2>Resumen de tu viaje</h2>
 
@@ -172,8 +172,14 @@
         <!-- Sección de Horario -->
         <div class="info-section">
           <div class="date-header">
-            <h3 class="section-title">Horario</h3>
-            <span id="fecha" class="travel-date"></span>
+            <div class="date-header-item">
+              <h3 class="section-title">Horario</h3>
+            </div>
+            <div class="date-header-item date-header-item2">
+              <span id="fecha" class="travel-date"></span>
+            </div>
+            <div class="date-header-item">
+            </div>
           </div>
 
 
@@ -261,7 +267,7 @@
     </script>
 
 
-    <script type="module" src="js/script.js"></script>
+    <script type="module" src="../js/script.js"></script>
 
 
 </body>

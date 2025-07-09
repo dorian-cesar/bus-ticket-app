@@ -243,8 +243,8 @@
 
         const token = localStorage.getItem('tokenSesion');
         const caja = localStorage.getItem('idCaja');
-        if (token && !isTokenExpired(token) || caja) {
-            window.location.href = '/app.html';
+        if (token && !isTokenExpired(token) && caja) {
+            window.location.href = '/html/app.html';
         }
 
         function isTokenExpired(token) {
@@ -261,7 +261,7 @@
         // Manejo del formulario
         document.getElementById('loginForm').addEventListener('submit', async function (e) {
             e.preventDefault();
-            const email = document.getElementById('username').value; // ahora es email
+            const email = document.getElementById('username').value;
             const password = document.getElementById('password').value;
             const errorElement = document.getElementById('error');
 
@@ -272,9 +272,7 @@
             submitButton.disabled = true;
             errorElement.textContent = '';
 
-            function generarIdCaja() {
-                return 'caja_' + Date.now();
-            }
+
 
 
             try {
@@ -289,11 +287,9 @@
                 const data = await res.json();
                 if (res.ok) {
                     console.log(data);
-                    const idCaja = generarIdCaja();
                     localStorage.setItem('tokenSesion', data.token);
                     localStorage.setItem('user', JSON.stringify(data.user));
-                    localStorage.setItem('idCaja', idCaja);
-                    window.location.href = '/app.html';
+                    window.location.href = '/html/caja.html';
                 } else {
                     errorElement.textContent = data.error || 'Credenciales incorrectas. Por favor intenta nuevamente.';
                 }

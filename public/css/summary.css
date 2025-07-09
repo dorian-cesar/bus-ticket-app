@@ -61,7 +61,14 @@
   .date-header{
     display: flex;
     justify-content: space-between;
-    padding-right: 175px;
+  }
+  .date-header-item{
+    flex: 1;
+  }
+
+  .date-header-item2{
+    display: flex;
+    justify-content: center;
   }
   
   .route-info {

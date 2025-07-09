@@ -19,7 +19,7 @@ function generarFirma(params, secretKey) {
 export async function handler(event) {
   try {
     const body = JSON.parse(event.body);
-    const { amount, orderId } = body;
+    const { amount, orderId, email } = body;
     if (isNaN(amount) || Number(amount) <= 0) {
       return {
         statusCode: 400,
@@ -41,12 +41,13 @@ export async function handler(event) {
     const params = {
       apiKey: API_KEY,
       commerceOrder: orderId,
-      amount: "350",
+      amount: amount,
       currency: "CLP",
+      timeout: 1800,
       urlReturn: `${urlBase}/.netlify/functions/serveReturn`,
       urlConfirmation: `${urlBase}/.netlify/functions/flowCallback`,
       subject: "Compra de pasajes",
-      email: "dgonzalez@wit.la",
+      email: email || 'dgonzalez@wit.la',
     };
 
     // Ordenar y firmar

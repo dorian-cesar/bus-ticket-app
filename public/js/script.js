@@ -9,21 +9,19 @@ function isTokenExpired(token) {
     }
 }
 
-async function logout() {
-    localStorage.removeItem('idCaja');
-    localStorage.removeItem('tokenSesion');
-    localStorage.removeItem('user');
-    window.location.href = '/index.html';
+async function atras() {
+    window.location.href = '/html/caja.html';
 }
 
 const loginToken = localStorage.getItem('tokenSesion');
 const user = JSON.parse(localStorage.getItem('user'));
 const idCaja = localStorage.getItem('idCaja');
 
-if (isTokenExpired(loginToken)) {
+if (isTokenExpired(loginToken) || !idCaja) {
     localStorage.removeItem('idCaja');
     localStorage.removeItem('tokenSesion');
     localStorage.removeItem('user');
+    localStorage.removeItem('pendingPayment');
     window.location.href = '/index.html';
 } else {
     if (user) {
@@ -163,8 +161,6 @@ $(document).on('click', '.selectServiceBtn', function () {
     $.get(`https://boletos.dev-wit.com/api/services?origin=${$('#origin').val()}&destination=${$('#destination').val()}&date=${$('#date').val()}`, function (data) {
         currentServiceData = data.find(s => s.id === serviceId);
 
-        console.log("currentServiceData:", currentServiceData);
-
         updateTravelSummary(
             $('#origin option:selected').text(),
             $('#destination option:selected').text(),
@@ -198,9 +194,6 @@ $(document).on('click', '.selectServiceBtn', function () {
                 });
             };
             const layout = currentServiceData.seatLayout;
-
-            console.log("Service layout:", layout);
-
 
             if (layout) {
                 if (layout.floor1) renderSeats('Primer Piso', layout.floor1.seatMap, 1);
@@ -240,8 +233,6 @@ function updateTravelSummary(origin, destination, date, departureTime, arrivalTi
 
         $('#total-price').text('$' + getTotalPrice());
     }
-
-    $('.seccion3').addClass('active');
 }
 
 $(document).on('click', '.seat.available, .seat.selected', async function () {
@@ -429,67 +420,30 @@ async function handlePayment() {
     `);
 
     if (method === 'web') {
-        try {
-            const amount = getTotalPrice();
-            const orderId = generarIdUnico();
+        const amount = getTotalPrice();
 
+        try {
             if (amount <= 0) {
                 throw new Error("Monto inválido para el pago");
             }
 
-            // Guardar estado actual para posibles reintentos
-            localStorage.setItem('pendingPayment', JSON.stringify({
-                serviceId: currentServiceId,
-                seats: selectedSeats,
-                token: jwtToken
-            }));
-
-            const res = await fetch('/.netlify/functions/crearPago', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    amount,
-                    orderId,
-                    urlReturn: `${window.location.origin}/return.html`,
-                    urlConfirmation: `${window.location.origin}/.netlify/functions/flowCallback`
-                })
-            });
-
-            const data = await res.json();
-
-            if (!data.url) {
-                throw new Error("No se recibió URL de pago");
-            }
-
-            // Abrir ventana de pago
-            const paymentWindow = window.open(
-                data.url,
-                'flowPayment',
-                'width=800,height=600,scrollbars=yes,resizable=yes'
-            );
-
-            if (!paymentWindow) {
-                throw new Error("Popup bloqueado");
-            }
-
-            // Configurar temporizador para verificar si la ventana se cerró sin completar
-            const checkWindowClosed = setInterval(() => {
-                if (paymentWindow.closed) {
-                    clearInterval(checkWindowClosed);
-                    handlePaymentWindowClosed();
-                }
-            }, 1000);
-
-            // Escuchar mensaje desde return.html
-            const messageHandler = (event) => {
-                if (event.data?.tipo === 'pagoCompletado') {
-                    clearInterval(checkWindowClosed);
-                    window.removeEventListener('message', messageHandler);
-                    handlePaymentResult(event.data.success, event.data.status);
-                }
-            };
-
-            window.addEventListener('message', messageHandler);
+            // Mostrar formulario para ingresar correo antes de redirigir al pago
+            $modal.find('.modal-body').html(`
+                <div class="payment-web-confirmation">
+                    <h4>¿Confirmar pago con tarjeta?</h4>
+                    <p>Los asientos seleccionados se reservarán como pagados una vez aprobado el pago.</p>
+                    
+                    <div class="correocliente">
+                        <label for="clienteEmail">Correo del cliente (opcional)</label>
+                        <input type="email" id="clienteEmailWeb" class="correo-cliente" placeholder="cliente@correo.com">
+                    </div>
+    
+                    <div class="web-actions mt-4">
+                        <button class="btn btn-primary btn-continue-web-payment">Continuar con Pago</button>
+                        <button class="btn btn-secondary btn-cancel-payment btn-close-modal">Cancelar</button>
+                    </div>
+                </div>
+            `);
 
         } catch (error) {
             console.error("Error en pago web:", error);
@@ -497,15 +451,12 @@ async function handlePayment() {
                 <div class="payment-error">
                     <h4>Error al iniciar pago</h4>
                     <p>${error.message}</p>
-                    ${error.message === "Popup bloqueado" ?
-                    `<button class="btn btn-primary" onclick="window.open('${data?.url}', 'flowPayment')">
-                            Abrir Pago Manualmente
-                        </button>` : ''}
                     <button class="btn btn-secondary btn-close-modal">Volver</button>
                 </div>
             `);
         }
     }
+
     if (method === 'cash') {
         const amount = getTotalPrice();
         try {
@@ -516,7 +467,13 @@ async function handlePayment() {
                 <div class="payment-cash-confirmation">
                     <h4>¿Confirmar pago en efectivo?</h4>
                     <p>Los asientos seleccionados se reservarán como pagados.</p>
-                    <div class="cash-actions mt-3">
+                    
+                    <div class="correocliente">
+                        <label for="clienteEmail">Correo del cliente (opcional)</label>
+                        <input type="email" id="clienteEmail" class="correo-cliente" placeholder="cliente@correo.com">
+                    </div>
+    
+                    <div class="cash-actions mt-4">
                         <button class="btn btn-success btn-confirm-cash">Confirmar</button>
                         <button class="btn btn-secondary btn-cancel-payment btn-close-modal">Cancelar y Liberar Asientos</button>
                     </div>
@@ -536,6 +493,206 @@ async function handlePayment() {
 
     }
 }
+
+function esCorreoValido(email) {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email.toLowerCase());
+}
+
+
+$(document).on('click', '.btn-continue-web-payment', async function () {
+    const emailCliente = $('#clienteEmailWeb').val()?.trim() || '';
+    if (emailCliente && !esCorreoValido(emailCliente)) {
+        alert("El correo ingresado no es válido.");
+        return;
+    }
+    const amount = getTotalPrice();
+    const orderId = generarIdUnico();
+    const $modal = $('#paymentModal');
+
+    try {
+        if (amount <= 0) {
+            throw new Error("Monto inválido para el pago");
+        }
+
+        // Guardar estado actual para posibles reintentos
+        localStorage.setItem('pendingPayment', JSON.stringify({
+            serviceId: currentServiceId,
+            seats: selectedSeats,
+            token: jwtToken,
+            cliente: emailCliente
+        }));
+
+        // Mostrar cargando
+        $modal.find('.modal-body').html(`
+            <div class="payment-loading">
+                <div class="spinner"></div>
+                <p>Redirigiendo a pago...</p>
+            </div>
+        `);
+
+        const res = await fetch('/.netlify/functions/crearPago', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                amount,
+                orderId,
+                urlReturn: `${window.location.origin}/return.html`,
+                urlConfirmation: `${window.location.origin}/.netlify/functions/flowCallback`,
+                email: emailCliente
+            })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            const e = new Error(data.error || "Error en la creación del pago");
+            e.flowError = data.flowError;
+            throw e;
+        }
+
+        if (!data.url) {
+            throw new Error("No se recibió URL de pago");
+        }
+
+
+        const paymentWindow = window.open(
+            data.url,
+            'flowPayment',
+            'width=800,height=600,scrollbars=yes,resizable=yes'
+        );
+
+        if (!paymentWindow) {
+            throw new Error("Popup bloqueado");
+        }
+
+        const checkWindowClosed = setInterval(() => {
+            if (paymentWindow.closed) {
+                clearInterval(checkWindowClosed);
+                handlePaymentWindowClosed();
+            }
+        }, 1000);
+
+        const messageHandler = (event) => {
+            if (event.data?.tipo === 'pagoCompletado') {
+                clearInterval(checkWindowClosed);
+                window.removeEventListener('message', messageHandler);
+                handlePaymentResult(event.data.success, event.data.status);
+            }
+        };
+
+        window.addEventListener('message', messageHandler);
+
+    } catch (error) {
+        console.error("Error en continuar con pago:", error);
+
+        let mensaje = error.message;
+
+        if (error?.flowError?.code === 1620) {
+            mensaje = "El correo electrónico ingresado fue rechazado por Flow. Prueba con otro distinto.";
+        }
+
+        $modal.find('.modal-body').html(`
+            <div class="payment-error">
+                <h4>Error al iniciar pago</h4>
+                <p>${mensaje}</p>
+                <button class="btn btn-secondary btn-close-modal">Volver</button>
+            </div>
+        `);
+    }
+
+});
+
+$(document).on('click', '.btn-confirm-cash', async function () {
+    const $modal = $('#paymentModal');
+    const amount = getTotalPrice();
+    const now = new Date();
+    const orderId = generarIdUnico();
+
+    let processed = 0;
+    let errores = 0;
+
+    $(this).prop('disabled', true);
+
+    // Confirmar los asientos primero
+    selectedSeats.forEach(s => {
+        $.ajax({
+            url: `https://boletos.dev-wit.com/api/seats/${currentServiceId}/confirm`,
+            method: 'POST',
+            headers: {
+                Authorization: jwtToken,
+                'Content-Type': 'application/json'
+            },
+            data: JSON.stringify({
+                seatNumber: s.seat,
+                authCode: 'AUTHCASH123',
+                userId: user?.email || 'desconocido'
+            }),
+            success: () => {
+                $(`[data-seat="${s.seat}"]`).removeClass('selected').addClass('reserved').off('click');
+                processed++;
+
+                if (processed === selectedSeats.length) {
+                    if (errores === 0) {
+                        registrarMovimientoEfectivo();
+                    } else {
+                        showPaymentResult($modal, false);
+                        console.warn("No todos los asientos se confirmaron correctamente");
+                    }
+                }
+            },
+            error: () => {
+                processed++;
+                errores++;
+
+                if (processed === selectedSeats.length) {
+                    showPaymentResult($modal, false);
+                }
+            }
+        });
+    });
+
+    function registrarMovimientoEfectivo() {
+        const emailCliente = $('#clienteEmail').val()?.trim() || '';
+        const movimiento = {
+            caja: idCaja,
+            tipo: 'ingreso',
+            medioPago: 'efectivo',
+            monto: amount,
+            servicioId: currentServiceId,
+            origen: currentServiceData?.origin || $('#origin').val(),
+            destino: currentServiceData?.destination || $('#destination').val(),
+            horaSalida: currentServiceData?.departureTime || '--:--',
+            cliente: emailCliente,
+            descripcion: `Venta de pasajes servicio ${currentServiceId}`,
+            fecha: now.toISOString(),
+            usuario: user.email,
+            nroTransaccion: orderId,
+            asientos: selectedSeats.map(s => ({
+                seat: s.seat,
+                floor: s.floor,
+                price: s.price
+            }))
+        };
+
+
+        fetch('https://boletos.dev-wit.com/api/movimientos', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(movimiento)
+        })
+            .then(res => res.json())
+            .then(data => {
+                console.log('Pago registrado:', data);
+                localStorage.removeItem('pendingPayment');
+                showPaymentResult($modal, true);
+            })
+            .catch(err => {
+                console.error('Error al registrar el pago:', err);
+                showPaymentResult($modal, false);
+            });
+    }
+});
 
 function handlePaymentWindowClosed() {
     const $modal = $('#paymentModal');
@@ -736,72 +893,6 @@ async function cancelPayment() {
 
 
 
-$(document).on('click', '.btn-confirm-cash', async function () {
-    const $modal = $('#paymentModal');
-    const amount = getTotalPrice();
-    const orderId = generarIdUnico();
-
-    let processed = 0;
-
-    // Confirmar los asientos primero
-    selectedSeats.forEach(s => {
-        $.ajax({
-            url: `https://boletos.dev-wit.com/api/seats/${currentServiceId}/confirm`,
-            method: 'POST',
-            headers: {
-                Authorization: jwtToken,
-                'Content-Type': 'application/json'
-            },
-            data: JSON.stringify({
-                seatNumber: s.seat,
-                authCode: 'AUTHCASH123',
-                userId: 'usuario123'
-            }),
-            success: () => {
-                $(`[data-seat="${s.seat}"]`).removeClass('selected').addClass('reserved').off('click');
-                processed++;
-
-                // Solo cuando se confirmen todos los asientos
-                if (processed === selectedSeats.length) {
-
-                    fetch('/.netlify/functions/registrarPago', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            orden: orderId,
-                            caja: idCaja,
-                            usuario: user.name,
-                            servicioId: currentServiceId,
-                            fecha: new Date().toISOString(),
-                            metodoPago: 'efectivo',
-                            monto: amount,
-                            asientos: selectedSeats,
-                        })
-                    })
-                        .then(res => res.json())
-                        .then(data => {
-                            console.log('Pago registrado:', data);
-                            showPaymentResult($modal, true);
-                            localStorage.removeItem('pendingPayment');
-                        })
-                        .catch(err => {
-                            console.error('Error al registrar el pago:', err);
-                            showPaymentResult($modal, false);
-                        });
-                }
-            },
-            error: () => {
-                processed++;
-                if (processed === selectedSeats.length) {
-                    showPaymentResult($modal, false);
-                }
-            }
-        });
-    });
-});
-
-
-
 window.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const paymentStatus = urlParams.get('payment_status');
@@ -818,7 +909,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     const logoutButton = document.getElementById('logoutBtn');
     if (logoutButton) {
-        logoutButton.addEventListener('click', logout);
+        logoutButton.addEventListener('click', atras);
     }
 });
 
