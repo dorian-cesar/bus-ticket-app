@@ -4,43 +4,7 @@ import path from 'path';
 export async function handler(event, context) {
   try {
     const filePath = path.join(process.cwd(), 'public', 'return.html');
-    let html = fs.readFileSync(filePath, 'utf8');
-
-    if (event.httpMethod === 'POST') {
-      const params = new URLSearchParams(event.body);
-      const token = params.get('token') || '';
-      const status = params.get('status') || '';
-
-      const scriptInjection = `
-        <script>
-          document.addEventListener('DOMContentLoaded', function() {
-            const token = "${token || ''}";
-            const status = "${status || '0'}";
-            
-            console.log('Token recibido:', token);
-            console.log('Status recibido:', status);
-            
-            if (token) {
-              try {
-                if (window.opener && !window.opener.closed) {
-                  window.opener.postMessage({
-                    tipo: 'pagoCompletado',
-                    token: token,
-                    status: status
-                  }, '*');
-                  
-                  setTimeout(() => window.close(), 2000);
-                }
-              } catch (e) {
-                console.error('Error en postMessage:', e);
-              }
-            }
-          });
-        </script>
-      `;
-
-      html = html.replace('</head>', scriptInjection + '</head>');
-    }
+    const html = fs.readFileSync(filePath, 'utf8');
 
     return {
       statusCode: 200,
@@ -50,7 +14,6 @@ export async function handler(event, context) {
       },
       body: html
     };
-
   } catch (err) {
     console.error('Error en serveReturn:', err);
     return {

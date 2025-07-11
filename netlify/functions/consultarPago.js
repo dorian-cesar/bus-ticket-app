@@ -1,63 +1,47 @@
-import crypto from 'crypto';
-
-const API_KEY = process.env.FLOW_API_KEY;
-const SECRET_KEY = process.env.FLOW_SECRET_KEY;
-const FLOW_URL = process.env.FLOW_URL;
-
-function generarFirma(params, secretKey) {
-  const keys = Object.keys(params).sort();
-  let toSign = '';
-  keys.forEach(k => {
-    toSign += k + params[k];
-  });
-  return crypto.createHmac('sha256', secretKey).update(toSign).digest('hex');
-}
-
 export async function handler(event) {
-  if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Método no permitido' };
-  }
-
   try {
-    const { token } = JSON.parse(event.body);
+    const { orderId, token } = JSON.parse(event.body);
 
-    if (!token) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: 'Token requerido' })
-      };
-    }
+    const url = `http://sandbox.dev-wit.com/api/paymentStatus/${orderId}?token=${token}`;
+    const response = await fetch(url);
 
-    const params = {
-      apiKey: API_KEY,
-      token
-    };
-    params.s = generarFirma(params, SECRET_KEY);
+    const contentType = response.headers.get('content-type');
+    const raw = await response.text();
 
-    const response = await fetch(`${FLOW_URL}/payment/getStatus`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams(params).toString()
-    });
-
-    const result = await response.json();
+    // Mostrar la respuesta cruda en consola
+    console.log("Respuesta cruda:", raw);
 
     if (!response.ok) {
       return {
-        statusCode: 500,
-        body: JSON.stringify({ error: 'Error en Flow', flowError: result })
+        statusCode: response.status,
+        body: JSON.stringify({
+          error: "Error al consultar Flow",
+          raw,
+          status: response.status
+        })
       };
     }
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify(result)
-    };
-
-  } catch (err) {
+    // Asegurar que la respuesta es JSON antes de parsear
+    if (contentType && contentType.includes("application/json")) {
+      const data = JSON.parse(raw);
+      return {
+        statusCode: 200,
+        body: JSON.stringify(data)
+      };
+    } else {
+      return {
+        statusCode: 500,
+        body: JSON.stringify({
+          error: "Respuesta inesperada (no es JSON)",
+          raw
+        })
+      };
+    }
+  } catch (error) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Error interno', message: err.message })
+      body: JSON.stringify({ error: error.message })
     };
   }
 }

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Caja | Sistema</title>
+    <title>Gestión de Caja</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -402,6 +402,10 @@
                     showError("Debes cerrar la caja antes de salir");
                     return;
                 }
+
+                const confirmar = confirm("¿Estás seguro de cerrar sesión?");
+                if (!confirmar) return;
+
                 localStorage.clear();
                 window.location.href = '/index.html';
             }
@@ -548,6 +552,11 @@
             }
 
             async function cerrarCaja() {
+                const confirmar = confirm("Después de cerrar la caja no podrás ver lo vendido");
+
+                if (!confirmar) {
+                    return;
+                }
                 const id = localStorage.getItem('idCaja');
                 if (!id) {
                     showError('No hay una caja abierta');
@@ -564,7 +573,14 @@
 
                     if (!res.ok) {
                         const error = await res.json();
-                        throw new Error(error.error || 'Error al cerrar la caja');
+                        showError(error.error || 'Error al cerrar la caja, pero podrás abrir otra');
+                        localStorage.removeItem('idCaja');
+
+                        document.getElementById('btnAbrirCaja').disabled = false;
+                        document.getElementById('btnCerrarCaja').disabled = true;
+                        document.getElementById('irACaja').disabled = true;
+                        document.getElementById('btnVendido').disabled = true;
+                        return;
                     }
 
                     const data = await res.json();
@@ -582,7 +598,12 @@
                     document.getElementById('btnVendido').disabled = true;
                 } catch (err) {
                     console.error(err);
-                    showError(err.message);
+                    showError('Error inesperado al cerrar la caja');
+                    localStorage.removeItem('idCaja');
+                    document.getElementById('btnAbrirCaja').disabled = false;
+                    document.getElementById('btnCerrarCaja').disabled = true;
+                    document.getElementById('irACaja').disabled = true;
+                    document.getElementById('btnVendido').disabled = true;
                 }
             }
 

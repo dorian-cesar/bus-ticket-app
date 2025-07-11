@@ -1,13 +1,19 @@
 import crypto from 'crypto';
 
-const API_KEY = process.env.FLOW_API_KEY;
-const SECRET_KEY = process.env.FLOW_SECRET_KEY;
-const FLOW_URL = process.env.FLOW_URL;
+//prod
+//const API_KEY = process.env.FLOW_API_KEY;
+//const SECRET_KEY = process.env.FLOW_SECRET_KEY;
+//const FLOW_URL = process.env.FLOW_URL;
+
+//sand
+const API_KEY = process.env.FLOW_SANDBOX_KEY;
+const SECRET_KEY = process.env.FLOW_SANDBOX_SECRET;
+const FLOW_URL = process.env.FLOW_URL_SANDBOX;
 
 const FLOW_API_URL = `${FLOW_URL}/payment/create`;
 
 function generarFirma(params, secretKey) {
-  const keys = Object.keys(params).filter(k => k !== 's').sort(); // 🔥 Excluye 's'
+  const keys = Object.keys(params).filter(k => k !== 's').sort();
   let toSign = "";
   keys.forEach(k => {
     toSign += k + params[k];
@@ -41,11 +47,11 @@ export async function handler(event) {
     const params = {
       apiKey: API_KEY,
       commerceOrder: orderId,
-      amount: amount,
+      amount: "350",
       currency: "CLP",
       timeout: 1800,
       urlReturn: `${urlBase}/.netlify/functions/serveReturn`,
-      urlConfirmation: `${urlBase}/.netlify/functions/flowCallback`,
+      urlConfirmation: 'http://sandbox.dev-wit.com/api/paymentConfirmation',
       subject: "Compra de pasajes",
       email: email || 'dgonzalez@wit.la',
     };
