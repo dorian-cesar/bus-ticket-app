@@ -196,6 +196,10 @@ html {
     height: auto;
   }
 
+  .contenedor-contenido-seccio2 {
+    height: 100%;
+  }
+
   .seccion {
     flex: none;
     width: 100%;

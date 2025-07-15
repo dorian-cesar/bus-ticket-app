@@ -1,28 +1,51 @@
+import crypto from 'crypto';
+
+const FLOW_SANDBOX_KEY = process.env.FLOW_SANDBOX_KEY;
+const FLOW_SANDBOX_SECRET = process.env.FLOW_SANDBOX_SECRET;
+const FLOW_URL_SANDBOX = process.env.FLOW_URL_SANDBOX;
+
+function signParams(params, secretKey) {
+  const keys = Object.keys(params).filter(k => k !== 's').sort();
+  let toSign = '';
+  keys.forEach(k => {
+    toSign += k + params[k];
+  });
+  return crypto.createHmac('sha256', secretKey).update(toSign).digest('hex');
+}
+
 export async function handler(event) {
   try {
     const { orderId, token } = JSON.parse(event.body);
 
-    const url = `http://sandbox.dev-wit.com/api/paymentStatus/${orderId}?token=${token}`;
+    if (!token || !orderId) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Faltan parámetros (token, orderId)" })
+      };
+    }
+
+    const params = {
+      apiKey: FLOW_SANDBOX_KEY,
+      token
+    };
+    params.s = signParams(params, FLOW_SANDBOX_SECRET);
+
+    const url = `${FLOW_URL_SANDBOX}/payment/getStatus?` + new URLSearchParams(params).toString();
     const response = await fetch(url);
-
-    const contentType = response.headers.get('content-type');
     const raw = await response.text();
-
-    // Mostrar la respuesta cruda en consola
-    console.log("Respuesta cruda:", raw);
 
     if (!response.ok) {
       return {
         statusCode: response.status,
         body: JSON.stringify({
-          error: "Error al consultar Flow",
+          error: "Error al consultar Flow directamente",
           raw,
           status: response.status
         })
       };
     }
 
-    // Asegurar que la respuesta es JSON antes de parsear
+    const contentType = response.headers.get('content-type');
     if (contentType && contentType.includes("application/json")) {
       const data = JSON.parse(raw);
       return {
@@ -33,11 +56,12 @@ export async function handler(event) {
       return {
         statusCode: 500,
         body: JSON.stringify({
-          error: "Respuesta inesperada (no es JSON)",
+          error: "Respuesta inesperada de Flow (no es JSON)",
           raw
         })
       };
     }
+
   } catch (error) {
     return {
       statusCode: 500,

@@ -1,0 +1,283 @@
+:root {
+    --primary: #004ca6;
+    --primary-dark: #003b84;
+    --secondary: #f37b31;
+    --error: #ef233c;
+    --success: #4bb543;
+    --light: #f8f9fa;
+    --dark: #212529;
+    --gray: #6c757d;
+    --border: rgba(255, 255, 255, 0.3);
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-image: url('../img/fondo3.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh;
+    color: white;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    width: 100%;
+    max-width: 500px;
+    padding: 40px;
+    margin: 20px;
+    animation: fadeIn 0.5s ease-out;
+    color: white;
+}
+
+#saldoInicial {
+    width: 100%;
+    max-width: 250px;
+    box-sizing: border-box;
+    display: block;
+    margin: 0 auto;
+}
+
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.logo h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    text-align: center;
+    color: white;
+    position: relative;
+    padding-bottom: 15px;
+}
+
+.logo h1::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background: var(--secondary);
+    border-radius: 3px;
+}
+
+h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 30px;
+    text-align: center;
+    color: white;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 1rem;
+    font-weight: 500;
+    color: white;
+}
+
+input {
+    width: 100%;
+    padding: 14px 20px;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--secondary);
+    box-shadow: 0 0 0 3px rgba(243, 123, 49, 0.2);
+}
+
+input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+button {
+    width: 100%;
+    padding: 14px;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+button:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 76, 166, 0.3);
+}
+
+button:disabled {
+    background-color: var(--gray);
+    cursor: not-allowed;
+    opacity: 0.7;
+    transform: none;
+    box-shadow: none;
+}
+
+.btnCerrarSesion{
+    background-color: #f37b31;
+}
+
+.btnCerrarSesion:hover {
+    background-color: #b1541b;
+}
+
+.button-group {
+    display: flex;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.button-group button {
+    flex: 1;
+}
+
+.error-message,
+.success-message {
+    font-size: 1rem;
+    margin-top: 20px;
+    text-align: center;
+    min-height: 24px;
+    padding: 12px;
+    border-radius: 8px;
+}
+
+.error-message {
+    background-color: rgba(239, 35, 60, 0.2);
+    color: white;
+}
+
+.success-message {
+    background-color: rgba(75, 181, 67, 0.2);
+    color: white;
+}
+
+.saldo-form {
+    margin-top: 30px;
+    padding: 25px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background-color: rgba(0, 76, 166, 0.3);
+    animation: slideDown 0.4s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.status-info,
+.ventas-info,
+.cierre-info {
+    text-align: center;
+    margin: 25px 0;
+    padding: 20px;
+    border-radius: 12px;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.status-info {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background-color: rgba(0, 76, 166, 0.3);
+    color: white;
+}
+
+.ventas-info {
+    background-color: rgb(255, 255, 255);
+    color: black;
+}
+
+.cierre-info {
+    background-color: rgba(239, 35, 60, 0.2);
+    color: white;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container {
+        padding: 30px;
+    }
+
+    .logo h1 {
+        font-size: 1.8rem;
+    }
+
+    h2 {
+        font-size: 1.3rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 25px 20px;
+        margin: 15px;
+    }
+
+    .button-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    button {
+        padding: 12px;
+    }
+
+    .logo h1 {
+        font-size: 1.6rem;
+    }
+}

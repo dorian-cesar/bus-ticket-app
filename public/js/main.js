@@ -68,22 +68,26 @@ $('#searchForm').on('submit', function (e) {
             $('#serviceList').append(`
                 <li class="list-group-item service-list-item" data-service-id="${service.id}">
                     <div class="contenido-item">
+                        <div class="header-servicio">
+                            ${service.company} (${service.busTypeDescription}) <strong>${service.departureTime}</strong> - <strong>${service.arrivalTime}</strong>
+                        </div>
                         <div class="contenido-servicio">
-                            <div class="header-servicio">
-                            ${service.company} (${service.busTypeDescription}) <strong>${service.departureTime}</strong> - <strong>${service.arrivalTime}</strong> 
-                            </div>
                             <div class="info-servicio">
                                 <div class="info1">
                                     <strong>${service.availableSeats}</strong> Asientos Disponibles
                                 </div>
                                 <div class="info2">
-                                    <div><strong>Piso 1: </strong><br>${service.seatDescriptionFirst} - <strong>$${service.priceFirst}</strong></div>
-                                    <div><strong>Piso 2: </strong><br>${service.seatDescriptionSecond} - <strong>$${service.priceSecond}</strong></div>
+                                    <div>
+                                        <strong>Piso 1: </strong>${service.seatDescriptionFirst} - <strong>$${service.priceFirst}</strong>
+                                    </div>
+                                    <div>
+                                        <strong>Piso 2: </strong>${service.seatDescriptionSecond} - <strong>$${service.priceSecond}</strong>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="button-servicio">
-                            <button class="btn selectServiceBtn btn-primary" data-id="${service.id}">Ver Asientos</button>
+                            <div class="button-servicio">
+                                <button class="btn selectServiceBtn btn-primary" data-id="${service.id}">Ver Asientos</button>
+                            </div>
                         </div>
                     </div>
                 </li>
@@ -186,8 +190,8 @@ function updateTravelSummary(origin, destination, date, departureTime, arrivalTi
     $('#origen').text(origin);
     $('#destino').text(destination);
     $('#fecha').text(date);
-    $('#hora-ida').text(departureTime || '--:--');
-    $('#hora-llegada').text(arrivalTime || '--:--');
+    $('#hora-ida').text(departureTime || '');
+    $('#hora-llegada').text(arrivalTime || '');
 
     // También actualiza otros datos del bus si es necesario
     if (currentServiceData) {
