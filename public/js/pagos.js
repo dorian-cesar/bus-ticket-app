@@ -372,6 +372,7 @@ $(document).on('click', '.btn-continue-web-payment', async function () {
 
                             function registrarMovimientoWeb(pagoInfo) {
                                 const movimiento = {
+                                    empresa: currentServiceData?.company || 'Empresa desconocida',
                                     caja: idCaja,
                                     tipo: 'ingreso',
                                     medioPago: 'tarjeta',
@@ -402,17 +403,28 @@ $(document).on('click', '.btn-continue-web-payment', async function () {
                                     headers: { 'Content-Type': 'application/json' },
                                     body: JSON.stringify(movimiento)
                                 })
-                                    .then(res => res.json())
-                                    .then(data => {
-                                        console.log('Pago registrado:', data);
-                                        localStorage.removeItem('pendingPayment');
-                                        localStorage.removeItem('currentPayment');
+                                    .then(async res => {
+                                        const data = await res.json();
+                                        if (!res.ok) {
+                                            throw new Error('Error al registrar el movimiento: ' + data.message || 'Respuesta no válida del servidor');
+                                        }
+
+                                        console.log('Pago registrado');
+                                        generarBoleta(movimiento);
                                         showPaymentResult($modal, true);
                                         resetTravelSummary();
                                     })
                                     .catch(err => {
                                         console.error('Error al registrar el pago:', err);
-                                        showPaymentResult($modal, false);
+
+                                        // ✅ Si ya fue cobrado pero falló solo el render de la boleta, no mostrar "error en el pago"
+                                        $modal.find('.modal-body').html(`
+                                      <div class="payment-warning">
+                                        <h3>Pago realizado correctamente</h3>
+                                        <p>Se detectó un problema al generar la boleta, pero tu transacción fue registrada.</p>
+                                        <button class="btn btn-secondary btn-close-modal">Aceptar</button>
+                                      </div>
+                                    `);
                                     });
                             }
                         } else if ([3, 4].includes(resultado.status)) {
@@ -566,6 +578,7 @@ $(document).on('click', '.btn-confirm-card', async function () {
 
         function registrarMovimientoTarjeta() {
             const movimiento = {
+                empresa: currentServiceData?.company || 'Empresa desconocida',
                 caja: idCaja,
                 tipo: 'ingreso',
                 medioPago: 'tarjeta',
@@ -599,8 +612,8 @@ $(document).on('click', '.btn-confirm-card', async function () {
             })
                 .then(res => res.json())
                 .then(data => {
-                    console.log('Pago registrado:', data);
-                    localStorage.removeItem('pendingPayment');
+                    console.log('Pago registrado');
+                    generarBoleta(movimiento);
                     showPaymentResult($modal, true);
                     resetTravelSummary();
                 })
@@ -678,6 +691,7 @@ $(document).on('click', '.btn-confirm-cash', async function () {
     function registrarMovimientoEfectivo() {
         const emailCliente = $('#clienteEmail').val()?.trim() || '';
         const movimiento = {
+            empresa: currentServiceData?.company || 'Empresa desconocida',
             caja: idCaja,
             tipo: 'ingreso',
             medioPago: 'efectivo',
@@ -706,8 +720,8 @@ $(document).on('click', '.btn-confirm-cash', async function () {
         })
             .then(res => res.json())
             .then(data => {
-                console.log('Pago registrado:', data);
-                localStorage.removeItem('pendingPayment');
+                console.log('Pago registrado');
+                generarBoleta(movimiento);
                 showPaymentResult($modal, true);
             })
             .catch(err => {
@@ -882,9 +896,8 @@ $(document).on('click', '.btn-retry-payment', async function () {
                             })
                                 .then(res => res.json())
                                 .then(data => {
-                                    console.log('Pago registrado:', data);
-                                    localStorage.removeItem('pendingPayment');
-                                    localStorage.removeItem('currentPayment');
+                                    console.log('Pago registrado');
+                                    generarBoleta(movimiento);
                                     showPaymentResult($modal, true);
                                     resetTravelSummary();
                                 })
@@ -1050,6 +1063,17 @@ function showPaymentResult($modal, isSuccess) {
             </div>
         `);
     }
+}
+
+async function generarBoleta(movimiento) {
+    const res = await fetch('/.netlify/functions/generarBoleta', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(movimiento)
+    });
+
+    const data = await res.json();
+    console.log(data.printDataBase64);
 }
 
 function resetTravelSummary() {

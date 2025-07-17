@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Boleta de Pago</title>
+    <style>
+        html,
+        body {
+            font-family: 'Inter', sans-serif;
+            padding: 0;
+            margin: 0;
+            height: 100vh;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .boleta {
+            max-width: 400px;
+            margin: auto;
+            border: 1px solid #333;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .total {
+            text-align: right;
+            font-weight: bold;
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 0.8em;
+            text-align: center;
+            color: #555;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="boleta">
+        <h2>Boleta de Pago</h2>
+        <p><strong>Empresa:</strong> <span id="empresa"></span></p>
+        <p><strong>Servicio:</strong> <span id="servicioId"></span></p>
+        <p><strong>Origen:</strong> <span id="origen"></span> &nbsp;→&nbsp; <strong>Destino:</strong> <span
+                id="destino"></span></p>
+        <p><strong>Salida:</strong> <span id="horaSalida"></span></p>
+
+        <hr>
+
+        <p><strong>Cliente:</strong> <span id="cliente"></span></p>
+        <p><strong>Usuario vendedor:</strong> <span id="usuario"></span></p>
+        <p><strong>Fecha:</strong> <span id="fecha"></span></p>
+        <p><strong>Medio de pago:</strong> <span id="tipo"></span></p>
+
+        <h3>Asientos</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>N° Asiento</th>
+                    <th>Piso</th>
+                    <th>Precio</th>
+                </tr>
+            </thead>
+            <tbody id="tablaAsientos"></tbody>
+        </table>
+
+        <p class="total">Total: $<span id="total"></span></p>
+        <p><strong>Transacción:</strong> <span id="transaccion"></span></p>
+
+        <div class="footer">
+            Gracias por su compra. No olvides llegar 10 minutos antes del horario de salida.
+        </div>
+    </div>
+
+    <script>
+        const data = JSON.parse(localStorage.getItem('boletaData'));
+
+        document.getElementById('empresa').textContent = data.empresa || 'Empresa desconocida';
+        document.getElementById('servicioId').textContent = data.servicioId;
+        document.getElementById('origen').textContent = data.origen;
+        document.getElementById('destino').textContent = data.destino;
+        document.getElementById('horaSalida').textContent = data.horaSalida;
+        document.getElementById('cliente').textContent = data.cliente || 'N/A';
+        document.getElementById('usuario').textContent = data.usuario;
+        document.getElementById('fecha').textContent = new Date(data.fecha).toLocaleString();
+        document.getElementById('tipo').textContent = data.medioPago;
+        document.getElementById('total').textContent = data.monto;
+        document.getElementById('transaccion').textContent = data.nroTransaccion;
+
+        const tbody = document.getElementById('tablaAsientos');
+        data.asientos.forEach(a => {
+            const row = document.createElement('tr');
+            row.innerHTML = `<td>${a.seat}</td><td>${a.floor || '—'}</td><td>$${a.price}</td>`;
+            tbody.appendChild(row);
+        });
+
+        // window.onload = () => {
+        //     window.print();
+        //     window.onafterprint = () => {
+        //         localStorage.removeItem('boletaData');
+        //     };
+        // };
+    </script>
+</body>
+
+</html>

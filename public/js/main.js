@@ -38,8 +38,8 @@ $('#searchForm').on('submit', function (e) {
     updateTravelSummary(originText, destinationText, formattedDate, null, null);
 
     $('#serviceList').empty().append(`
-        <li class="list-group-item loading" style="height: 100px;"></li>
-        <li class="list-group-item loading" style="height: 100px;"></li>
+        <li class="list-group-item loading" style="height: 154px;"></li>
+        <li class="list-group-item loading" style="height: 154px;"></li>
     `);
 
     $.get(`https://boletos.dev-wit.com/api/services?origin=${origin}&destination=${destination}&date=${date}`, function (data) {
@@ -243,6 +243,11 @@ $(document).on('click', '.seat.available, .seat.selected', async function () {
         });
     } else {
         // Reservar asiento
+        if (selectedSeats.length >= 5) {
+            alert('Solo puedes seleccionar hasta 5 asientos por transacción.');
+            return;
+        }
+
         $.ajax({
             url: `https://boletos.dev-wit.com/api/seats/${currentServiceId}/reserve`,
             method: 'POST',

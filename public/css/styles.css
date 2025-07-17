@@ -210,3 +210,19 @@ html {
     height: auto;
   }
 }
+
+@media (max-width: 550px) {
+
+  html,
+  body {
+    overflow-y: auto;
+  }
+
+  .contenido-seccion{
+    flex-direction: column;
+  }
+
+  .contenedor-contenido-seccio2{
+    overflow-y: auto;
+  }
+}
