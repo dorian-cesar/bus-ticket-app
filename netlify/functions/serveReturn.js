@@ -1,7 +1,7 @@
-import fs from 'fs';
-import path from 'path';
+const fs = require('fs');
+const path = require('path');
 
-export async function handler(event, context) {
+exports.handler = async function(event, context) {
   try {
     const filePath = path.join(process.cwd(), 'public', 'return.html');
     const html = fs.readFileSync(filePath, 'utf8');

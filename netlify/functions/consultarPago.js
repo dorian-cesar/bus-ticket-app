@@ -1,4 +1,5 @@
-import crypto from 'crypto';
+const crypto = require('crypto');
+const fetch = require('node-fetch');
 
 const FLOW_SANDBOX_KEY = process.env.FLOW_SANDBOX_KEY;
 const FLOW_SANDBOX_SECRET = process.env.FLOW_SANDBOX_SECRET;
@@ -13,7 +14,7 @@ function signParams(params, secretKey) {
   return crypto.createHmac('sha256', secretKey).update(toSign).digest('hex');
 }
 
-export async function handler(event) {
+exports.handler = async function (event) {
   try {
     const { orderId, token } = JSON.parse(event.body);
 
@@ -68,4 +69,4 @@ export async function handler(event) {
       body: JSON.stringify({ error: error.message })
     };
   }
-}
+};

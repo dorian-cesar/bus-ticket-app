@@ -7,6 +7,11 @@ function esCorreoValido(email) {
     return regex.test(email.toLowerCase());
 }
 
+function hayPagoPendiente() {
+    return !!localStorage.getItem('currentPayment');
+}
+
+
 /*================================================================================================================
 |----------------------------------------------------  MODAL  ----------------------------------------------------|
 ================================================================================================================*/
@@ -312,6 +317,12 @@ $(document).on('click', '.btn-continue-web-payment', async function () {
                 console.warn("ya hay un polling activo, no se inicia de nuevo.")
                 return;
             };
+
+            if (!hayPagoPendiente()) {
+                console.log("No hay pago pendiente, no se inicia polling.");
+                return;
+            }
+
             pollingActivo = true;
             clearInterval(pollingInterval);
             pollingInterval = setInterval(async () => {
@@ -413,6 +424,8 @@ $(document).on('click', '.btn-continue-web-payment', async function () {
                                         generarBoleta(movimiento);
                                         showPaymentResult($modal, true);
                                         resetTravelSummary();
+                                        localStorage.removeItem('pendingPayment');
+                                        localStorage.removeItem('currentPayment');
                                     })
                                     .catch(err => {
                                         console.error('Error al registrar el pago:', err);
@@ -425,6 +438,8 @@ $(document).on('click', '.btn-continue-web-payment', async function () {
                                         <button class="btn btn-secondary btn-close-modal">Aceptar</button>
                                       </div>
                                     `);
+                                        localStorage.removeItem('pendingPayment');
+                                        localStorage.removeItem('currentPayment');
                                     });
                             }
                         } else if ([3, 4].includes(resultado.status)) {
@@ -471,6 +486,7 @@ $(document).on('click', '.btn-continue-web-payment', async function () {
                         orderId,
                         isWebPayment: true
                     });
+                    localStorage.removeItem('currentPayment');
                 }
             }, 2000);
         };
@@ -478,7 +494,7 @@ $(document).on('click', '.btn-continue-web-payment', async function () {
         iniciarPolling(); // inicial
 
         document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'visible') {
+            if (document.visibilityState === 'visible' && hayPagoPendiente()) {
                 iniciarPolling(); // reinicia polling al volver a la pestaña
             }
         });
@@ -900,6 +916,8 @@ $(document).on('click', '.btn-retry-payment', async function () {
                                     generarBoleta(movimiento);
                                     showPaymentResult($modal, true);
                                     resetTravelSummary();
+                                    localStorage.removeItem('currentPayment');
+                                    localStorage.removeItem('pendingPayment');
                                 })
                                 .catch(err => {
                                     console.error('Error al registrar el pago:', err);
@@ -914,7 +932,6 @@ $(document).on('click', '.btn-retry-payment', async function () {
                             message: obtenerMensajeErrorFlow(resultado.status),
                             orderId
                         });
-                        localStorage.removeItem('pendingPayment');
                         localStorage.removeItem('currentPayment');
                     } else {
                         clearInterval(pollingInterval);
@@ -924,7 +941,6 @@ $(document).on('click', '.btn-retry-payment', async function () {
                             message: 'Estado de pago desconocido. Intente nuevamente.',
                             orderId
                         });
-                        localStorage.removeItem('pendingPayment');
                         localStorage.removeItem('currentPayment');
                     }
 
@@ -935,7 +951,6 @@ $(document).on('click', '.btn-retry-payment', async function () {
                             message: "Tiempo de espera agotado",
                             orderId
                         });
-                        localStorage.removeItem('pendingPayment');
                         localStorage.removeItem('currentPayment');
                     }
                 }

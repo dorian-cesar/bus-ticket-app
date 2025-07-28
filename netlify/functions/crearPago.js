@@ -1,4 +1,4 @@
-import crypto from 'crypto';
+const crypto = require('crypto');
 
 //prod
 //const API_KEY = process.env.FLOW_API_KEY;
@@ -22,7 +22,7 @@ function generarFirma(params, secretKey) {
 }
 
 
-export async function handler(event) {
+exports.handler = async function(event) {
   try {
     const body = JSON.parse(event.body);
     const { amount, orderId, email } = body;
